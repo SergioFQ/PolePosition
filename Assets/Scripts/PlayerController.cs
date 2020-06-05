@@ -20,7 +20,7 @@ public class PlayerController : NetworkBehaviour
     public float footBrake = 1e+24f;
     public float topSpeed = 200f;
     public float downForce = 100f;
-    public float slipLimit = 0.2f;
+    public float slipLimit = 0.2f; //coeficiente de rozamiento
 
     private float CurrentRotation { get; set; }
     private float InputAcceleration { get; set; }
@@ -28,7 +28,7 @@ public class PlayerController : NetworkBehaviour
     private float InputBrake { get; set; }
 
     private PlayerInfo m_PlayerInfo;
-
+    private WheelFrictionCurve myWfc;//creamos la curva de fricción para eliminar la deriva
     private Rigidbody m_Rigidbody;
     private float m_SteerHelper = 0.8f;
 
@@ -51,6 +51,7 @@ public class PlayerController : NetworkBehaviour
 
     public event OnSpeedChangeDelegate OnSpeedChangeEvent;
 
+
     #endregion Variables
 
     #region Unity Callbacks
@@ -59,6 +60,9 @@ public class PlayerController : NetworkBehaviour
     {
         m_Rigidbody = GetComponent<Rigidbody>();
         m_PlayerInfo = GetComponent<PlayerInfo>();
+
+        myWfc = axleInfos[0].leftWheel.sidewaysFriction;
+        myWfc.extremumSlip = 0.2f;
     }
 
     public void Update()
@@ -76,9 +80,10 @@ public class PlayerController : NetworkBehaviour
         InputBrake = Mathf.Clamp(InputBrake, 0, 1);
 
         float steering = maxSteeringAngle * InputSteering;
-
+        
         foreach (AxleInfo axleInfo in axleInfos)
         {
+
             if (axleInfo.steering)
             {
                 axleInfo.leftWheel.steerAngle = steering;
@@ -93,6 +98,7 @@ public class PlayerController : NetworkBehaviour
                     axleInfo.leftWheel.brakeTorque = 0;
                     axleInfo.rightWheel.motorTorque = forwardMotorTorque;
                     axleInfo.rightWheel.brakeTorque = 0;
+
                 }
 
                 if (InputAcceleration < -float.Epsilon)
@@ -108,7 +114,7 @@ public class PlayerController : NetworkBehaviour
                     axleInfo.leftWheel.motorTorque = 0;
                     axleInfo.leftWheel.brakeTorque = engineBrake;
                     axleInfo.rightWheel.motorTorque = 0;
-                    axleInfo.rightWheel.brakeTorque = engineBrake;
+                    axleInfo.rightWheel.brakeTorque = engineBrake; 
                 }
 
                 if (InputBrake > 0)
@@ -116,9 +122,23 @@ public class PlayerController : NetworkBehaviour
                     axleInfo.leftWheel.brakeTorque = footBrake;
                     axleInfo.rightWheel.brakeTorque = footBrake;
                 }
+                //si la velocidad es demasiado baja (estamos parados), subimos el rozamiento lateral para impedir la deriva del jugador. Una vez en moviemiento volverá a su valor inicial que es 0.2
+                if (Math.Abs(axleInfo.leftWheel.attachedRigidbody.velocity.magnitude) < 0.25f)
+                {
+                    myWfc.extremumSlip = 0.3f;//nuevo valor rozamiento
+                }
+                else
+                {
+                    myWfc.extremumSlip = 0.2f;
+                }
+                
+                           
             }
+            //asignamos el valor de la fricción lateral
+            axleInfo.leftWheel.sidewaysFriction = myWfc;
+            axleInfo.rightWheel.sidewaysFriction = myWfc;
 
-            ApplyLocalPositionToVisuals(axleInfo.leftWheel);
+            ApplyLocalPositionToVisuals(axleInfo.leftWheel);//las ruedas estan al reves nombradas (es como si se viesen de frente y no de espaldas)
             ApplyLocalPositionToVisuals(axleInfo.rightWheel);
         }
 
@@ -153,6 +173,7 @@ public class PlayerController : NetworkBehaviour
                 var howMuchSlip = (wheelHitRight.forwardSlip - slipLimit) / (1 - slipLimit);
                 axleInfo.rightWheel.motorTorque -= axleInfo.rightWheel.motorTorque * howMuchSlip * slipLimit;
             }
+           
         }
     }
 
