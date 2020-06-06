@@ -31,10 +31,9 @@ public class PlayerController : NetworkBehaviour
     private WheelFrictionCurve myWfc;//creamos la curva de fricción para eliminar la deriva
     private Rigidbody m_Rigidbody;
     private float m_SteerHelper = 0.8f;
-
-
+    Vector3 pos = new Vector3(0, 0, 0);
     private float m_CurrentSpeed = 0;
-
+    private PolePositionManager m_PolePositionManager;
     private float Speed
     {
         get { return m_CurrentSpeed; }
@@ -58,9 +57,9 @@ public class PlayerController : NetworkBehaviour
 
     public void Awake()
     {
+        //m_PolePositionManager = GetComponent<NetworkBehaviour>().GetComponentInChildren<PolePositionManager>(); No funciona, no consigo acceder
         m_Rigidbody = GetComponent<Rigidbody>();
         m_PlayerInfo = GetComponent<PlayerInfo>();
-
         myWfc = axleInfos[0].leftWheel.sidewaysFriction;
         myWfc.extremumSlip = 0.2f;
     }
@@ -78,7 +77,6 @@ public class PlayerController : NetworkBehaviour
         InputSteering = Mathf.Clamp(InputSteering, -1, 1);
         InputAcceleration = Mathf.Clamp(InputAcceleration, -1, 1);
         InputBrake = Mathf.Clamp(InputBrake, 0, 1);
-
         float steering = maxSteeringAngle * InputSteering;
         
         foreach (AxleInfo axleInfo in axleInfos)
@@ -131,17 +129,33 @@ public class PlayerController : NetworkBehaviour
                 {
                     myWfc.extremumSlip = 0.2f;
                 }
-                
-                           
             }
             //asignamos el valor de la fricción lateral
             axleInfo.leftWheel.sidewaysFriction = myWfc;
             axleInfo.rightWheel.sidewaysFriction = myWfc;
 
+            if (Vector3.Dot(transform.up, Vector3.down) > 0)
+            {
+                transform.position = new Vector3(-41.14f, 0, 100.2f); //pos; Debería ser pos pero puse un sitio random para comprobar que funcionaba
+                transform.up = Vector3.up;
+            }
+            else
+            {
+                /*Esto supuestamente guardaría el último punto en el que el coche estaba en el circuito decentemente. 
+                 * Bueno el 6 está puesto de random habría que cuadrar la distancia con el ancho de la carretera
+                 * if ((m_PolePositionManager.posSphere[m_PlayerInfo.ID] - transform.position).magnitude < 6)
+                {
+                    Debug.Log(transform.position);
+                    pos = transform.position;
+                }*/
+                
+            }
             ApplyLocalPositionToVisuals(axleInfo.leftWheel);//las ruedas estan al reves nombradas (es como si se viesen de frente y no de espaldas)
             ApplyLocalPositionToVisuals(axleInfo.rightWheel);
         }
         
+
+
         SteerHelper();
         SpeedLimiter();
         AddDownForce();

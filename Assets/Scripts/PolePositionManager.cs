@@ -9,7 +9,7 @@ public class PolePositionManager : NetworkBehaviour
 {
     public int numPlayers;
     public NetworkManager networkManager;
-
+    public Vector3[] posSphere; //vector publico que guardaría la posición de las esferas aunque en teoría solo se necesitaría la propia
     private readonly List<PlayerInfo> m_Players = new List<PlayerInfo>(4);
     private CircuitController m_CircuitController;
     private GameObject[] m_DebuggingSpheres;
@@ -18,12 +18,13 @@ public class PolePositionManager : NetworkBehaviour
     {
         if (networkManager == null) networkManager = FindObjectOfType<NetworkManager>();
         if (m_CircuitController == null) m_CircuitController = FindObjectOfType<CircuitController>();
-
-        m_DebuggingSpheres = new GameObject[networkManager.maxConnections];
+        posSphere = new Vector3[4];
+        m_DebuggingSpheres = new GameObject[networkManager.maxConnections]; 
         for (int i = 0; i < networkManager.maxConnections; ++i)
         {
             m_DebuggingSpheres[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             m_DebuggingSpheres[i].GetComponent<SphereCollider>().enabled = false;
+            posSphere[i] = this.m_DebuggingSpheres[i].transform.position; // Se inicializa a la primera posición de la esfera en el circuito y se actualiza más abajo
         }
     }
 
@@ -68,14 +69,14 @@ public class PolePositionManager : NetworkBehaviour
         }
 
         m_Players.Sort(new PlayerInfoComparer(arcLengths));
-
+        
         string myRaceOrder = "";
         foreach (var _player in m_Players)
         {
             myRaceOrder += _player.Name + " ";
         }
 
-        Debug.Log("El orden de carrera es: " + myRaceOrder);
+        //Debug.Log("El orden de carrera es: " + myRaceOrder);
     }
 
     float ComputeCarArcLength(int ID)
@@ -93,7 +94,7 @@ public class PolePositionManager : NetworkBehaviour
             this.m_CircuitController.ComputeClosestPointArcLength(carPos, out segIdx, out carProj, out carDist);
 
         this.m_DebuggingSpheres[ID].transform.position = carProj;
-
+        posSphere[ID] = this.m_DebuggingSpheres[ID].transform.position; //actualización de la posición de la esfera por ID, esto sí funciona
         if (this.m_Players[ID].CurrentLap == 0)
         {
             minArcL -= m_CircuitController.CircuitLength;
