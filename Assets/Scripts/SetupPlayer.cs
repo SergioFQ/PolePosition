@@ -18,6 +18,7 @@ public class SetupPlayer : NetworkBehaviour
     private PlayerController m_PlayerController;
     private PlayerInfo m_PlayerInfo;
     private PolePositionManager m_PolePositionManager;
+    
 
     #region Start & Stop Callbacks
 
@@ -42,6 +43,7 @@ public class SetupPlayer : NetworkBehaviour
         m_PlayerInfo.ID = m_ID;
         m_PlayerInfo.Name = "Player" + m_ID;
         m_PlayerInfo.CurrentLap = 0;
+        m_PlayerInfo.ColorID = m_UIManager.colorNumber;
         m_PolePositionManager.AddPlayer(m_PlayerInfo);
     }
 
@@ -71,6 +73,7 @@ public class SetupPlayer : NetworkBehaviour
         {
             m_PlayerController.enabled = true;
             m_PlayerController.OnSpeedChangeEvent += OnSpeedChangeEventHandler;
+            ConfigureColor();
             ConfigureCamera();
         }
     }
@@ -83,5 +86,29 @@ public class SetupPlayer : NetworkBehaviour
     void ConfigureCamera()
     {
         if (Camera.main != null) Camera.main.gameObject.GetComponent<CameraController>().m_Focus = this.gameObject;
+    }
+
+    void ConfigureColor()
+    {
+
+        switch (m_PlayerInfo.ColorID)
+        {
+            case 0:
+                transform.Find("raceCar").Find("body_red").gameObject.SetActive(true);//GetComponentInChildren<Renderer>().enabled = false;
+                break;
+            case 1:
+                transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_green").gameObject.SetActive(true);
+
+                break;
+            case 2:
+                transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_orange").gameObject.SetActive(true);
+                break;
+            case 3:
+                transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_white").gameObject.SetActive(true);
+                break;
+        }
     }
 }

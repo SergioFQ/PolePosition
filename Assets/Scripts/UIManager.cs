@@ -16,6 +16,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button buttonClient;
     [SerializeField] private Button buttonServer;
     [SerializeField] private InputField inputFieldIP;
+    [SerializeField] private Button buttonColor;
+    [SerializeField] private InputField inputFieldName; 
 
     [Header("In-Game HUD")] [SerializeField]
     private GameObject inGameHUD;
@@ -23,6 +25,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Text textSpeed;
     [SerializeField] private Text textLaps;
     [SerializeField] private Text textPosition;
+    [SerializeField] private Text textColor;
+
+    public int colorNumber = 0;
 
     private void Awake()
     {
@@ -34,6 +39,7 @@ public class UIManager : MonoBehaviour
         buttonHost.onClick.AddListener(() => StartHost());
         buttonClient.onClick.AddListener(() => StartClient());
         buttonServer.onClick.AddListener(() => StartServer());
+        buttonColor.onClick.AddListener(()=>SelectColor());
         ActivateMainMenu();
     }
 
@@ -71,5 +77,28 @@ public class UIManager : MonoBehaviour
     {
         m_NetworkManager.StartServer();
         ActivateInGameHUD();
+    }
+
+    //cambiamos el color del coche dando click al botón de color las veces que sean necesarias hasta ver que aparece el texto del color deseado. Los colores son (ROJO, VERDE, AMARILLO Y BLANCO)
+    private void SelectColor()
+    {
+        Text text = buttonColor.GetComponentInChildren<Text>();
+        colorNumber++;
+        if (colorNumber >= 4) { colorNumber = 0; }
+        switch (colorNumber)
+        {
+            case 0:
+                text.text = "COLOR: RED";
+                break;
+            case 1:
+                text.text = "COLOR: GREEN";
+                break;
+            case 2:
+                text.text = "COLOR: YELLOW";
+                break;
+            case 3:
+                text.text = "COLOR: WHITE";
+                break;
+        }
     }
 }
