@@ -28,7 +28,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Text textColor;
 
     public int colorNumber = 0;
-
+    public string playerName = null;
     private void Awake()
     {
         m_NetworkManager = FindObjectOfType<NetworkManager>();
@@ -64,12 +64,14 @@ public class UIManager : MonoBehaviour
     {
         m_NetworkManager.StartHost();
         ActivateInGameHUD();
+        playerName = inputFieldName.text;
     }
 
     private void StartClient()
     {
         m_NetworkManager.StartClient();
         m_NetworkManager.networkAddress = inputFieldIP.text;
+        playerName = inputFieldName.text;
         ActivateInGameHUD();
     }
 
@@ -94,7 +96,7 @@ public class UIManager : MonoBehaviour
                 text.text = "COLOR: GREEN";
                 break;
             case 2:
-                text.text = "COLOR: YELLOW";
+                text.text = "COLOR: ORANGE";
                 break;
             case 3:
                 text.text = "COLOR: WHITE";

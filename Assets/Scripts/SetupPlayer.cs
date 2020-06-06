@@ -44,6 +44,7 @@ public class SetupPlayer : NetworkBehaviour
         m_PlayerInfo.Name = "Player" + m_ID;
         m_PlayerInfo.CurrentLap = 0;
         m_PlayerInfo.ColorID = m_UIManager.colorNumber;
+        m_PlayerInfo.Name = m_UIManager.playerName;
         m_PolePositionManager.AddPlayer(m_PlayerInfo);
     }
 
@@ -88,13 +89,14 @@ public class SetupPlayer : NetworkBehaviour
         if (Camera.main != null) Camera.main.gameObject.GetComponent<CameraController>().m_Focus = this.gameObject;
     }
 
+    //dependiendo del id del color seleccionado en botón de color del menú inicial, cambiaremos la skin de nuestro vehiculo
     void ConfigureColor()
     {
 
         switch (m_PlayerInfo.ColorID)
         {
             case 0:
-                transform.Find("raceCar").Find("body_red").gameObject.SetActive(true);//GetComponentInChildren<Renderer>().enabled = false;
+                transform.Find("raceCar").Find("body_red").gameObject.SetActive(true);
                 break;
             case 1:
                 transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
