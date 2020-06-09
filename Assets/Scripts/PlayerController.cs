@@ -34,7 +34,8 @@ public class PlayerController : NetworkBehaviour
     Vector3 pos = new Vector3(0, 0, 0);
     private float m_CurrentSpeed = 0;
     public int m_CurrentLap = -1;
-    //private PolePositionManager m_PolePositionManager;
+    private PolePositionManager m_PolePositionManager;//usado para controlar cuando el jugador vuelca
+    private CameraController m_cameraController;//usado para controlar cuando el jugador vuelca
 
     private float Speed
     {
@@ -74,11 +75,13 @@ public class PlayerController : NetworkBehaviour
 
     public void Awake()
     {
-        // m_PolePositionManager = GetComponent<NetworkBehaviour>().GetComponentInChildren<PolePositionManager>(); No funciona, no consigo acceder
+        m_PolePositionManager = FindObjectOfType<PolePositionManager>();
+        m_cameraController = FindObjectOfType<CameraController>();
         m_Rigidbody = GetComponent<Rigidbody>();
         m_PlayerInfo = GetComponent<PlayerInfo>();
         myWfc = axleInfos[0].leftWheel.sidewaysFriction;
         myWfc.extremumSlip = 0.2f;
+        
     }
 
     public void Update()
@@ -146,33 +149,37 @@ public class PlayerController : NetworkBehaviour
                 {
                     myWfc.extremumSlip = 0.2f;
                 }
+                //Debug volcar y spawnear cuando salimos de la pista
+                if (Input.GetKeyDown(KeyCode.F))
+                {
+                    transform.Rotate(0,0,90);
+                }
             }
             //asignamos el valor de la fricción lateral
             axleInfo.leftWheel.sidewaysFriction = myWfc;
             axleInfo.rightWheel.sidewaysFriction = myWfc;
-
+            
             if (Vector3.Dot(transform.up, Vector3.down) > 0)
             {
-                transform.position = new Vector3(-41.14f, 0, 100.2f); //pos; Debería ser pos pero puse un sitio random para comprobar que funcionaba
-                transform.up = Vector3.up;
+                Debug.Log("Player antes del golpe: " + transform.position);
+                Debug.Log("Player ha vuelto: "+pos);
+                Debug.Log("x: "+m_cameraController.nextPoint.x +"y: " +m_cameraController.nextPoint.y+ "z: "+m_cameraController.nextPoint.z);
+
+                transform.position = pos;
+                transform.LookAt(m_cameraController.nextPoint);
+                m_Rigidbody.velocity = new Vector3(0f,0f,0f);
             }
             else
             {
 
-                /*Esto supuestamente guardaría el último punto en el que el coche estaba en el circuito decentemente. 
+                /*Esto guardaría el último punto en el que el coche estaba en el circuito decentemente. 
                  * Bueno el 7 está puesto de random habría que cuadrar la distancia con el ancho de la carretera
-                 * if ((m_PolePositionManager.posSphere[m_PlayerInfo.ID] - transform.position).magnitude < 7)
+                 */
+                if ((m_PolePositionManager.posSphere[m_PlayerInfo.ID] - transform.position).magnitude < 7)
                 {
-                    Debug.Log(transform.position);
+                    
                     pos = transform.position;
                 }
-                
-                if ((this.gameObject.GetComponentInChildren<PolePositionManager>().posSphere[m_PlayerInfo.ID] - transform.position).magnitude < 7)
-                {
-                    Debug.Log(transform.position);
-                    pos = transform.position;
-                }
-                */
 
             }
             ApplyLocalPositionToVisuals(axleInfo.leftWheel);//las ruedas estan al reves nombradas (es como si se viesen de frente y no de espaldas)

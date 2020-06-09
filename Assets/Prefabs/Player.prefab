@@ -257,7 +257,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  bodyCar: {fileID: 3920702165282228366}
 --- !u!114 &3466774584401487325
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -301,6 +300,7 @@ MonoBehaviour:
   topSpeed: 200
   downForce: 1000
   slipLimit: 0.2
+  m_CurrentLap: -1
 --- !u!114 &6346869062069434778
 MonoBehaviour:
   m_ObjectHideFlags: 0

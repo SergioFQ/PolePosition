@@ -1676,6 +1676,7 @@ MonoBehaviour:
   m_Distance: 10
   m_Elevation: 8
   m_Following: 0.5
+  nextPoint: {x: 0, y: 0, z: 0}
 --- !u!1001 &381981127
 PrefabInstance:
   m_ObjectHideFlags: 0

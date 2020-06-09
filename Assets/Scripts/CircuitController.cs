@@ -35,8 +35,9 @@ public class CircuitController : MonoBehaviour
         m_TotalLength = m_CumArcLength[m_CumArcLength.Length - 1];
     }
 
-    public Vector3 GetSegment(int idx)
+    public Vector3 GetSegment(int idx, out Vector3 nextPoint)//guardamos el siguiente punto para hacer que el jugador apunte alli al salirse de la pista o volcarse
     {
+        nextPoint = m_PathPos[(idx + 1) % m_PathPos.Length];
         return m_PathPos[idx + 1] - m_PathPos[idx];
     }
 

@@ -19,6 +19,6 @@ public class LapManager : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         other.gameObject.GetComponentInChildren<PlayerController>().m_CurrentLap++;
-        Debug.Log(other.gameObject.GetComponentInChildren<PlayerController>().m_CurrentLap);
+        //Debug.Log(other.gameObject.GetComponentInChildren<PlayerController>().m_CurrentLap);
     }
 }
