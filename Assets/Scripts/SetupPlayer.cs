@@ -40,12 +40,20 @@ public class SetupPlayer : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
-        m_PlayerInfo.ID = m_ID;
-        m_PlayerInfo.Name = "Player" + m_ID;
-        m_PlayerInfo.CurrentLap = 0;
-        m_PlayerInfo.ColorID = m_UIManager.colorNumber;
-        m_PlayerInfo.Name = m_UIManager.playerName;
-        m_PolePositionManager.AddPlayer(m_PlayerInfo);
+        if (isLocalPlayer)
+        {
+            m_PlayerInfo.ID = m_ID;
+            m_PlayerInfo.Name = "Player" + m_ID;
+            m_PlayerInfo.CurrentLap = -1;
+            Debug.Log(m_PlayerInfo.Name);
+            m_PlayerInfo.ColorID = m_UIManager.colorNumber;
+            m_PlayerInfo.Name = m_UIManager.playerName; //Esto no va nice
+            m_PolePositionManager.AddPlayer(m_PlayerInfo);
+        }
+        else
+        {
+            Debug.Log(m_Name + "Name: " +m_PlayerInfo.Name + " Color " + m_PlayerInfo.ColorID + " Pos " + m_PlayerInfo.CurrentPosition);
+        }
     }
 
     /// <summary>
@@ -74,6 +82,7 @@ public class SetupPlayer : NetworkBehaviour
         {
             m_PlayerController.enabled = true;
             m_PlayerController.OnSpeedChangeEvent += OnSpeedChangeEventHandler;
+            m_PlayerController.OnLapChangeEvent += OnLapChangeEventHandler;
             ConfigureColor();
             ConfigureCamera();
         }
@@ -82,6 +91,12 @@ public class SetupPlayer : NetworkBehaviour
     void OnSpeedChangeEventHandler(float speed)
     {
         m_UIManager.UpdateSpeed((int) speed * 5); // 5 for visualization purpose (km/h)
+    }
+
+    void OnLapChangeEventHandler(int lap)
+    {
+        m_UIManager.UpdateLap(lap);
+        m_PlayerInfo.CurrentLap = lap;
     }
 
     void ConfigureCamera()

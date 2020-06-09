@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
     public bool showGUI = true;
-
+    private PolePositionManager m_polePositionManager;
     private NetworkManager m_NetworkManager;
 
     [Header("Main Menu")] [SerializeField] private GameObject mainMenu;
@@ -39,13 +39,25 @@ public class UIManager : MonoBehaviour
         buttonHost.onClick.AddListener(() => StartHost());
         buttonClient.onClick.AddListener(() => StartClient());
         buttonServer.onClick.AddListener(() => StartServer());
-        buttonColor.onClick.AddListener(()=>SelectColor());
+        buttonColor.onClick.AddListener(() => SelectColor());
         ActivateMainMenu();
     }
 
     public void UpdateSpeed(int speed)
     {
         textSpeed.text = "Speed " + speed + " Km/h";
+    }
+
+    public void UpdateLap(int lap)
+    {
+        if (lap == -1)
+        {
+            textLaps.text = "Lap " + 0 + "/5";
+        }
+        else
+        {
+            textLaps.text = "Lap " + lap + "/5";
+        }
     }
 
     private void ActivateMainMenu()
