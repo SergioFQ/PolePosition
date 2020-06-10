@@ -28,7 +28,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Text textColor;
 
     public int colorNumber = 0;
-    public string playerName = null;
+    public string playerName = "";
     private void Awake()
     {
         m_NetworkManager = FindObjectOfType<NetworkManager>();

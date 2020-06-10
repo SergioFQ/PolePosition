@@ -39,6 +39,7 @@ public class PolePositionManager : NetworkBehaviour
     public void AddPlayer(PlayerInfo player)
     {
         m_Players.Add(player);
+
     }
 
     private class PlayerInfoComparer : Comparer<PlayerInfo>
@@ -74,6 +75,8 @@ public class PolePositionManager : NetworkBehaviour
         foreach (var _player in m_Players)
         {
             myRaceOrder += _player.Name + " ";
+            //Debug.Log(_player.Name);
+            //Debug.Log(myRaceOrder);
         }
 
         //Debug.Log("El orden de carrera es: " + myRaceOrder);

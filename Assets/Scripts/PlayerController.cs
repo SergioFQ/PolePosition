@@ -36,7 +36,7 @@ public class PlayerController : NetworkBehaviour
     public int m_CurrentLap = -1;
     private PolePositionManager m_PolePositionManager;//usado para controlar cuando el jugador vuelca
     private CameraController m_cameraController;//usado para controlar cuando el jugador vuelca
-
+    private bool debugUpsideDown = false;
     private float Speed
     {
         get { return m_CurrentSpeed; }
@@ -91,6 +91,12 @@ public class PlayerController : NetworkBehaviour
         InputBrake = Input.GetAxis("Jump");
         Speed = m_Rigidbody.velocity.magnitude;
         Lap = m_CurrentLap;
+
+        //Debug volcar y spawnear cuando salimos de la pista
+        if (Input.GetKeyUp(KeyCode.F))
+        {
+            debugUpsideDown = true; 
+        }
     }
 
     public void FixedUpdate()
@@ -149,16 +155,20 @@ public class PlayerController : NetworkBehaviour
                 {
                     myWfc.extremumSlip = 0.2f;
                 }
-                //Debug volcar y spawnear cuando salimos de la pista
-                if (Input.GetKeyDown(KeyCode.F))
-                {
-                    transform.Rotate(0,0,90);
-                }
+
+                
+                
             }
             //asignamos el valor de la fricción lateral
             axleInfo.leftWheel.sidewaysFriction = myWfc;
             axleInfo.rightWheel.sidewaysFriction = myWfc;
-            
+
+            if (debugUpsideDown)
+            {
+                transform.Rotate(0, 0, 90);
+                debugUpsideDown = false;
+            }
+
             if (Vector3.Dot(transform.up, Vector3.down) > 0)
             {
                 Debug.Log("Player antes del golpe: " + transform.position);
@@ -178,10 +188,13 @@ public class PlayerController : NetworkBehaviour
                 if ((m_PolePositionManager.posSphere[m_PlayerInfo.ID] - transform.position).magnitude < 7)
                 {
                     
-                    pos = transform.position;
+                    pos = m_PolePositionManager.posSphere[m_PlayerInfo.ID];
                 }
 
             }
+
+            
+
             ApplyLocalPositionToVisuals(axleInfo.leftWheel);//las ruedas estan al reves nombradas (es como si se viesen de frente y no de espaldas)
             ApplyLocalPositionToVisuals(axleInfo.rightWheel);
         }
