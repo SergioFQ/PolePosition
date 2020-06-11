@@ -163,43 +163,13 @@ public class PlayerController : NetworkBehaviour
             axleInfo.leftWheel.sidewaysFriction = frictionCurve;
             axleInfo.rightWheel.sidewaysFriction = frictionCurve;
 
-            if (debugUpsideDown)
-            {
-                transform.Rotate(0, 0, 90);
-                debugUpsideDown = false;
-            }
-
-            if (Vector3.Dot(transform.up, Vector3.down) > 0)
-            {
-                Debug.Log("Player antes del golpe: " + transform.position);
-                Debug.Log("Player ha vuelto: "+pos);
-                Debug.Log("x: "+m_cameraController.nextPoint.x +"y: " +m_cameraController.nextPoint.y+ "z: "+m_cameraController.nextPoint.z);
-
-                transform.position = pos;
-                transform.LookAt(m_cameraController.nextPoint);
-                m_Rigidbody.velocity = new Vector3(0f,0f,0f);
-            }
-            else
-            {
-
-                /*Esto guardaría el último punto en el que el coche estaba en el circuito decentemente. 
-                 * Bueno el 7 está puesto de random habría que cuadrar la distancia con el ancho de la carretera
-                 */
-                if ((m_PolePositionManager.posSphere[m_PlayerInfo.ID] - transform.position).magnitude < 7)
-                {
-                    
-                    pos = m_PolePositionManager.posSphere[m_PlayerInfo.ID];
-                }
-
-            }
-
             
 
             ApplyLocalPositionToVisuals(axleInfo.leftWheel);//las ruedas estan al reves nombradas (es como si se viesen de frente y no de espaldas)
             ApplyLocalPositionToVisuals(axleInfo.rightWheel);
         }
-        
 
+        SavingPosition();
         SteerHelper();
         SpeedLimiter();
         AddDownForce();
@@ -210,6 +180,56 @@ public class PlayerController : NetworkBehaviour
 
     #region Methods
 
+    private void SavingPosition()
+    {
+        if (debugUpsideDown)
+        {
+            transform.Rotate(0, 0, 90);
+            debugUpsideDown = false;
+        }
+        
+        //si he chocado
+
+        //si esta volcado
+        if (Vector3.Dot(transform.up, Vector3.down) > 0)
+        {
+            /*Debug.Log("Player antes del golpe: " + transform.position);
+            Debug.Log("Player ha vuelto: " + pos);
+            Debug.Log("x: " + m_cameraController.nextPoint.x + "y: " + m_cameraController.nextPoint.y + "z: " + m_cameraController.nextPoint.z);*/
+
+            /*transform.position = pos;
+            transform.LookAt(m_cameraController.nextPoint);
+            m_Rigidbody.velocity = new Vector3(0f, 0f, 0f);*/
+            CrashSpawn();
+        }
+        else
+        {
+
+            /*Esto guardaría el último punto en el que el coche estaba en el circuito decentemente. 
+             * Bueno el 7 está puesto de random habría que cuadrar la distancia con el ancho de la carretera
+             */
+            if ((m_PolePositionManager.posSphere[m_PlayerInfo.ID] - transform.position).magnitude < 7)
+            {
+
+                pos = m_PolePositionManager.posSphere[m_PlayerInfo.ID];
+            }
+
+        }
+    }
+     private void CrashSpawn()
+    {
+        transform.position = pos;
+        transform.LookAt(m_cameraController.nextPoint);
+        m_Rigidbody.velocity = new Vector3(0f, 0f, 0f);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.transform.tag == "OutRace")
+        {
+            CrashSpawn();
+        }
+    }
     // crude traction control that reduces the power to wheel if the car is wheel spinning too much
     private void TractionControl()
     {
