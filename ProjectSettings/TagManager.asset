@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Vehicle
   - Puppet
+  - OutRace
   layers:
   - Default
   - TransparentFX

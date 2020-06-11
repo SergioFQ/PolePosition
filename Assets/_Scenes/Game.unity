@@ -556,6 +556,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: grandStand
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: c68053e1d3958e84a9ac5999b1fed081, type: 3}
+      propertyPath: m_TagString
+      value: OutRace
+      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: c68053e1d3958e84a9ac5999b1fed081, type: 3}
       propertyPath: m_LocalPosition.x
       value: -50
@@ -702,6 +706,10 @@ PrefabInstance:
     - target: {fileID: 100000, guid: 30ddd96dd4239554e879fab4e839f419, type: 3}
       propertyPath: m_Name
       value: grandStandCovered (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 30ddd96dd4239554e879fab4e839f419, type: 3}
+      propertyPath: m_TagString
+      value: OutRace
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 30ddd96dd4239554e879fab4e839f419, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2137,6 +2145,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: grandStandCovered (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 30ddd96dd4239554e879fab4e839f419, type: 3}
+      propertyPath: m_TagString
+      value: OutRace
+      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 30ddd96dd4239554e879fab4e839f419, type: 3}
       propertyPath: m_LocalPosition.x
       value: 30
@@ -2745,6 +2757,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: grandStandCovered (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 30ddd96dd4239554e879fab4e839f419, type: 3}
+      propertyPath: m_TagString
+      value: OutRace
+      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 30ddd96dd4239554e879fab4e839f419, type: 3}
       propertyPath: m_LocalPosition.x
       value: 20
@@ -3352,15 +3368,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: e4587f282ff69924fa90cd3bb5db9db7, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.20000003
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: e4587f282ff69924fa90cd3bb5db9db7, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.2
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: e4587f282ff69924fa90cd3bb5db9db7, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.20000003
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e4587f282ff69924fa90cd3bb5db9db7, type: 3}
@@ -3469,6 +3485,10 @@ PrefabInstance:
     - target: {fileID: 100000, guid: ba8bb1c4911150748b9246d98411916d, type: 3}
       propertyPath: m_Name
       value: grandStandAwning (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: ba8bb1c4911150748b9246d98411916d, type: 3}
+      propertyPath: m_TagString
+      value: OutRace
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: ba8bb1c4911150748b9246d98411916d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -5678,6 +5698,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: grandStandCovered (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 30ddd96dd4239554e879fab4e839f419, type: 3}
+      propertyPath: m_TagString
+      value: OutRace
+      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 30ddd96dd4239554e879fab4e839f419, type: 3}
       propertyPath: m_LocalPosition.x
       value: 30
@@ -6214,6 +6238,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: grandStandCovered (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 30ddd96dd4239554e879fab4e839f419, type: 3}
+      propertyPath: m_TagString
+      value: OutRace
+      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 30ddd96dd4239554e879fab4e839f419, type: 3}
       propertyPath: m_LocalPosition.x
       value: 20
@@ -6634,6 +6662,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: grandStandCovered (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 30ddd96dd4239554e879fab4e839f419, type: 3}
+      propertyPath: m_TagString
+      value: OutRace
+      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 30ddd96dd4239554e879fab4e839f419, type: 3}
       propertyPath: m_LocalPosition.x
       value: 30
@@ -6703,6 +6735,10 @@ PrefabInstance:
     - target: {fileID: 100000, guid: c68053e1d3958e84a9ac5999b1fed081, type: 3}
       propertyPath: m_Name
       value: grandStand (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: c68053e1d3958e84a9ac5999b1fed081, type: 3}
+      propertyPath: m_TagString
+      value: OutRace
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: c68053e1d3958e84a9ac5999b1fed081, type: 3}
       propertyPath: m_LocalPosition.x
@@ -7783,6 +7819,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: grandStandCovered (7)
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 30ddd96dd4239554e879fab4e839f419, type: 3}
+      propertyPath: m_TagString
+      value: OutRace
+      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 30ddd96dd4239554e879fab4e839f419, type: 3}
       propertyPath: m_LocalPosition.x
       value: 20
@@ -8613,7 +8653,7 @@ GameObject:
   - component: {fileID: 9126478171714260334}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8832,7 +8872,7 @@ GameObject:
   - component: {fileID: 9126478173507700317}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9067,7 +9107,7 @@ GameObject:
   - component: {fileID: 9126478171740392635}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9086,7 +9126,7 @@ GameObject:
   - component: {fileID: 9126478172012522868}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9319,7 +9359,7 @@ GameObject:
   - component: {fileID: 9126478173039849287}
   m_Layer: 0
   m_Name: corners
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9474,7 +9514,7 @@ GameObject:
   - component: {fileID: 9126478172355244359}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9627,7 +9667,7 @@ GameObject:
   - component: {fileID: 9126478172193002933}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9660,7 +9700,7 @@ GameObject:
   - component: {fileID: 9126478173357812055}
   m_Layer: 0
   m_Name: barrierWall
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9771,7 +9811,7 @@ GameObject:
   - component: {fileID: 9126478172056653126}
   m_Layer: 0
   m_Name: corners
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9850,7 +9890,7 @@ GameObject:
   - component: {fileID: 9126478172385605390}
   m_Layer: 0
   m_Name: barrierWall
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9897,7 +9937,7 @@ GameObject:
   - component: {fileID: 9126478173118997944}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10036,7 +10076,7 @@ GameObject:
   - component: {fileID: 9126478171740532657}
   m_Layer: 0
   m_Name: barrierWall
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10143,7 +10183,7 @@ GameObject:
   - component: {fileID: 9126478172273510806}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10242,7 +10282,7 @@ GameObject:
   - component: {fileID: 9126478171846159481}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10489,8 +10529,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9126478172355994043}
   m_LocalRotation: {x: -0, y: 0.70710677, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -40, y: 0, z: 20}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -40, y: 0, z: 20.03}
+  m_LocalScale: {x: 1.003, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7647861924379587229}
   m_RootOrder: 17
@@ -10597,7 +10637,7 @@ GameObject:
   - component: {fileID: 9126478172715283563}
   m_Layer: 0
   m_Name: barrierWall
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10724,7 +10764,7 @@ GameObject:
   - component: {fileID: 9126478172781758461}
   m_Layer: 0
   m_Name: barrierWall
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10929,7 +10969,7 @@ GameObject:
   - component: {fileID: 9126478172402690104}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11255,13 +11295,27 @@ GameObject:
   - component: {fileID: 9126478172589138913}
   - component: {fileID: 9126478172590268705}
   - component: {fileID: 9126478172987830694}
+  - component: {fileID: 9126478172592537570}
   m_Layer: 0
   m_Name: barrierWall
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!65 &9126478172592537570
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9126478172592537569}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 9.72, y: 1.312, z: 1.23}
+  m_Center: {x: 5.0406036, y: 0.656, z: 0.615}
 --- !u!4 &9126478172592563137
 Transform:
   m_ObjectHideFlags: 0
@@ -11290,7 +11344,7 @@ GameObject:
   - component: {fileID: 9126478172030459283}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11337,7 +11391,7 @@ GameObject:
   - component: {fileID: 9126478172539695429}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11462,7 +11516,7 @@ GameObject:
   - component: {fileID: 9126478173430399984}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11541,7 +11595,7 @@ GameObject:
   - component: {fileID: 9126478173469291416}
   m_Layer: 0
   m_Name: barrierWall
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11666,7 +11720,7 @@ GameObject:
   - component: {fileID: 9126478171948134459}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11730,7 +11784,7 @@ GameObject:
   - component: {fileID: 9126478173353171058}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11935,7 +11989,7 @@ GameObject:
   - component: {fileID: 9126478172374395024}
   m_Layer: 0
   m_Name: barrierWall
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12048,7 +12102,7 @@ GameObject:
   - component: {fileID: 9126478172247351412}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12187,7 +12241,7 @@ GameObject:
   - component: {fileID: 9126478173450554846}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12295,13 +12349,27 @@ GameObject:
   - component: {fileID: 9126478172913315025}
   - component: {fileID: 9126478172912348689}
   - component: {fileID: 9126478173171433284}
+  - component: {fileID: 9126478172914282706}
   m_Layer: 0
   m_Name: barrierWall
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!65 &9126478172914282706
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9126478172914282705}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 9.72, y: 1.312, z: 1.23}
+  m_Center: {x: 5.0406036, y: 0.656, z: 0.615}
 --- !u!4 &9126478172914642161
 Transform:
   m_ObjectHideFlags: 0
@@ -12330,7 +12398,7 @@ GameObject:
   - component: {fileID: 9126478173629948140}
   m_Layer: 0
   m_Name: barrierWall
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12423,7 +12491,7 @@ GameObject:
   - component: {fileID: 9126478171658994699}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12483,7 +12551,7 @@ MeshCollider:
   m_GameObject: {fileID: 9126478172592537569}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Convex: 0
   m_CookingOptions: 14
@@ -12548,7 +12616,7 @@ GameObject:
   - component: {fileID: 9126478173786304868}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12859,7 +12927,7 @@ GameObject:
   - component: {fileID: 9126478173229405436}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12919,7 +12987,7 @@ MeshCollider:
   m_GameObject: {fileID: 9126478172914282705}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Convex: 0
   m_CookingOptions: 14
@@ -13252,7 +13320,7 @@ GameObject:
   - component: {fileID: 9126478173705071855}
   m_Layer: 0
   m_Name: barrierWall
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13331,7 +13399,7 @@ GameObject:
   - component: {fileID: 9126478173433085094}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13378,7 +13446,7 @@ GameObject:
   - component: {fileID: 9126478173530676773}
   m_Layer: 0
   m_Name: corners
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13425,7 +13493,7 @@ GameObject:
   - component: {fileID: 9126478173100517368}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13658,7 +13726,7 @@ GameObject:
   - component: {fileID: 9126478173590097489}
   m_Layer: 0
   m_Name: barrierWall
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13918,7 +13986,7 @@ GameObject:
   - component: {fileID: 9126478172249477485}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14129,7 +14197,7 @@ GameObject:
   - component: {fileID: 9126478172051296563}
   m_Layer: 0
   m_Name: fenceStraight
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14282,7 +14350,7 @@ GameObject:
   - component: {fileID: 9126478173629993300}
   m_Layer: 0
   m_Name: corners
-  m_TagString: Untagged
+  m_TagString: OutRace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
