@@ -12,7 +12,7 @@ public class SetupPlayer : NetworkBehaviour
 {
     [SyncVar] private int m_ID;
     [SyncVar (hook = nameof(setName))] private string m_Name;
-    [SyncVar(hook = nameof(setColour))] private int m_Colour;
+    [SyncVar (hook = nameof(setColour))] private int m_Colour;
     private UIManager m_UIManager;
     private NetworkManager m_NetworkManager;
     private PlayerController m_PlayerController;
@@ -43,14 +43,14 @@ public class SetupPlayer : NetworkBehaviour
         if (isLocalPlayer)
         {
             m_PlayerInfo.ID = m_ID;
-            m_Name = (m_UIManager.playerName == "") ? ("Player" + m_ID) : (m_UIManager.playerName);
-            CmdSelectName(m_Name);
-            setName("",m_Name);
+            //m_Name = (m_UIManager.playerName == "") ? ("Player" + m_ID) : (m_UIManager.playerName);
+            CmdSelectName((m_UIManager.playerName == "") ? ("Player" + m_ID) : (m_UIManager.playerName));
+            //setName("",m_Name);
             m_PlayerInfo.CurrentLap = -1;
             //m_PlayerInfo.ColourID = m_UIManager.colorNumber;
-            m_Colour = m_UIManager.colorNumber;
-            CmdSelectColor(m_Colour);
-            setColour(0 , m_Colour);
+            //m_Colour = m_UIManager.colorNumber;
+            CmdSelectColor(m_UIManager.colorNumber);
+            //setColour(0 , m_Colour);
         }
 
         m_PolePositionManager.AddPlayer(m_PlayerInfo);
