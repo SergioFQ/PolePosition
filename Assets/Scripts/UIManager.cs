@@ -59,6 +59,10 @@ public class UIManager : MonoBehaviour
             textLaps.text = "Lap " + lap + "/5";
         }
     }
+    public void UpdateNames(string name)
+    {
+        textPosition.text = name;
+    }
 
     private void ActivateMainMenu()
     {

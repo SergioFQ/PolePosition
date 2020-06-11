@@ -52,7 +52,7 @@ public class SetupPlayer : NetworkBehaviour
             CmdSelectColor(m_UIManager.colorNumber);
             //setColour(0 , m_Colour);
         }
-
+        m_PlayerInfo.ID = m_ID;
         m_PolePositionManager.AddPlayer(m_PlayerInfo);
         /*else
         {
