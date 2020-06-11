@@ -28,7 +28,7 @@ public class PlayerController : NetworkBehaviour
     private float InputBrake { get; set; }
 
     private PlayerInfo m_PlayerInfo;
-    private WheelFrictionCurve myWfc;//creamos la curva de fricción para eliminar la deriva
+    private WheelFrictionCurve frictionCurve;//creamos la curva de fricción para eliminar la deriva
     private Rigidbody m_Rigidbody;
     private float m_SteerHelper = 0.8f;
     Vector3 pos = new Vector3(0, 0, 0);
@@ -79,8 +79,8 @@ public class PlayerController : NetworkBehaviour
         m_cameraController = FindObjectOfType<CameraController>();
         m_Rigidbody = GetComponent<Rigidbody>();
         m_PlayerInfo = GetComponent<PlayerInfo>();
-        myWfc = axleInfos[0].leftWheel.sidewaysFriction;
-        myWfc.extremumSlip = 0.2f;
+        frictionCurve = axleInfos[0].leftWheel.sidewaysFriction;
+        frictionCurve.extremumSlip = 0.2f;
         
     }
 
@@ -149,19 +149,19 @@ public class PlayerController : NetworkBehaviour
                 //si la velocidad es demasiado baja (estamos parados), subimos el rozamiento lateral para impedir la deriva del jugador. Una vez en moviemiento volverá a su valor inicial que es 0.2
                 if (Math.Abs(axleInfo.leftWheel.attachedRigidbody.velocity.magnitude) < 0.25f)
                 {
-                    myWfc.extremumSlip = 0.3f;//nuevo valor rozamiento
+                    frictionCurve.extremumSlip = 0.3f;//nuevo valor rozamiento
                 }
                 else
                 {
-                    myWfc.extremumSlip = 0.2f;
+                    frictionCurve.extremumSlip = 0.2f;
                 }
 
                 
                 
             }
             //asignamos el valor de la fricción lateral
-            axleInfo.leftWheel.sidewaysFriction = myWfc;
-            axleInfo.rightWheel.sidewaysFriction = myWfc;
+            axleInfo.leftWheel.sidewaysFriction = frictionCurve;
+            axleInfo.rightWheel.sidewaysFriction = frictionCurve;
 
             if (debugUpsideDown)
             {
