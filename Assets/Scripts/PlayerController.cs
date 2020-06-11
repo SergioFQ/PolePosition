@@ -33,7 +33,7 @@ public class PlayerController : NetworkBehaviour
     private float m_SteerHelper = 0.8f;
     Vector3 pos = new Vector3(0, 0, 0);
     private float m_CurrentSpeed = 0;
-    public int m_CurrentLap = -1;
+    public int m_CurrentLap;
     private PolePositionManager m_PolePositionManager;//usado para controlar cuando el jugador vuelca
     private CameraController m_cameraController;//usado para controlar cuando el jugador vuelca
     private bool debugUpsideDown = false;
@@ -79,8 +79,10 @@ public class PlayerController : NetworkBehaviour
         m_cameraController = FindObjectOfType<CameraController>();
         m_Rigidbody = GetComponent<Rigidbody>();
         m_PlayerInfo = GetComponent<PlayerInfo>();
+        m_CurrentLap = m_PlayerInfo.CurrentLap;
         frictionCurve = axleInfos[0].leftWheel.sidewaysFriction;
         frictionCurve.extremumSlip = 0.2f;
+        pos = transform.position;
         
     }
 
@@ -169,6 +171,8 @@ public class PlayerController : NetworkBehaviour
             ApplyLocalPositionToVisuals(axleInfo.rightWheel);
         }
 
+        //Debug.Log("Vuelta " +m_PlayerInfo.CurrentLap);
+        //Debug.Log(m_PlayerInfo.LastPoint);
         SavingPosition();
         SteerHelper();
         SpeedLimiter();
@@ -202,19 +206,19 @@ public class PlayerController : NetworkBehaviour
             m_Rigidbody.velocity = new Vector3(0f, 0f, 0f);*/
             CrashSpawn();
         }
-        else
-        {
+        //else
+        //{
 
             /*Esto guardaría el último punto en el que el coche estaba en el circuito decentemente. 
              * Bueno el 7 está puesto de random habría que cuadrar la distancia con el ancho de la carretera
              */
-            if ((m_PolePositionManager.posSphere[m_PlayerInfo.ID] - transform.position).magnitude < 7)
+          /*  if ((m_PolePositionManager.posSphere[m_PlayerInfo.ID] - transform.position).magnitude < 7)
             {
 
                 pos = m_PolePositionManager.posSphere[m_PlayerInfo.ID];
             }
 
-        }
+        }*/
     }
      private void CrashSpawn()
     {
@@ -225,11 +229,38 @@ public class PlayerController : NetworkBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        
         if (collision.transform.tag == "OutRace")
         {
-            CrashSpawn();
+            //contador para que si a los 2 segundos o asi sigues golpeando que llame a la funcion
+                CrashSpawn();
+            
+        }
+
+        
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.transform.tag == "Checkpoint")
+        {
+            //Debug.Log("hola");
+            int id = other.GetComponent<CheckpointsBehaviour>().ID;
+            if ((id == m_PlayerInfo.LastPoint + 1) || (id == 0 && m_PlayerInfo.LastPoint==12))
+            {
+                m_PlayerInfo.LastPoint = id;
+                pos = other.transform.position;
+            }
+
+            if (id <= m_PlayerInfo.LastPoint - 2)
+            {
+                //Debug.Log("Habria que hacer Spawn");
+                CrashSpawn();
+            }
         }
     }
+
+
     // crude traction control that reduces the power to wheel if the car is wheel spinning too much
     private void TractionControl()
     {

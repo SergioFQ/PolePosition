@@ -46,7 +46,8 @@ public class SetupPlayer : NetworkBehaviour
             //m_Name = (m_UIManager.playerName == "") ? ("Player" + m_ID) : (m_UIManager.playerName);
             CmdSelectName((m_UIManager.playerName == "") ? ("Player" + m_ID) : (m_UIManager.playerName));
             //setName("",m_Name);
-            m_PlayerInfo.CurrentLap = -1;
+            m_PlayerInfo.CurrentLap = 0;
+            m_PlayerInfo.LastPoint = -1;
             //m_PlayerInfo.ColourID = m_UIManager.colorNumber;
             //m_Colour = m_UIManager.colorNumber;
             CmdSelectColor(m_UIManager.colorNumber);

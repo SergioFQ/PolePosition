@@ -4,10 +4,13 @@ using UnityEngine;
 
 public class LapManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+
+    //private PlayerInfo m_PlayerInfo;
+
+    void Awake()
     {
-        
+        /*m_PlayerInfo = FindObjectOfType<PlayerInfo>();
+        Debug.Log(m_PlayerInfo.Name);*/
     }
 
     // Update is called once per frame
@@ -18,7 +21,17 @@ public class LapManager : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        other.gameObject.GetComponentInChildren<PlayerController>().m_CurrentLap++;
+        if (other.GetComponent<PlayerInfo>().LastPoint == 12)
+        {
+            Debug.Log("Bien");
+            other.GetComponent<PlayerInfo>().LastPoint = 0;
+            other.GetComponent<PlayerController>().m_CurrentLap++;
+        }
+        /*else
+        {
+            Debug.Log("Tramposo");
+        }*/
+        //other.gameObject.GetComponentInChildren<PlayerController>().m_CurrentLap++;
         //Debug.Log(other.gameObject.GetComponentInChildren<PlayerController>().m_CurrentLap);
     }
 }

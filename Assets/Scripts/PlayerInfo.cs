@@ -15,6 +15,8 @@ public class PlayerInfo : MonoBehaviour
 
     public int ColourID { get; set; }
 
+    public int LastPoint { get; set; }
+
     public override string ToString()
     {
         return Name;
