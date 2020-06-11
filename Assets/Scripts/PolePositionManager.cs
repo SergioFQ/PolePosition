@@ -11,31 +11,12 @@ public class PolePositionManager : NetworkBehaviour
     public NetworkManager networkManager;
     public Vector3[] posSphere; //vector publico que guardaría la posición de las esferas aunque en teoría solo se necesitaría la propia
     private readonly List<PlayerInfo> m_Players = new List<PlayerInfo>(4);
+    private List<PlayerInfo> ordenP = new List<PlayerInfo>(4);
     private CircuitController m_CircuitController;
     private GameObject[] m_DebuggingSpheres;
-    [SyncVar(hook = nameof(setRaceOrder))] private string myRaceOrder = "";
+    [SyncVar(hook = nameof(RpcSetRaceOrder))] private string myRaceOrder = "";
     private UIManager m_UIManager;
-
-
-    
-    private string RaceOrder
-    {
-        get { return myRaceOrder; }
-        set
-        {
-            if (OnPlayerCountChangeEvent != null)
-                OnPlayerCountChangeEvent(myRaceOrder);
-        }
-    }
-
-    public delegate void OnPlayerCountChangeDelegate(string newVal);
-
-    public event OnPlayerCountChangeDelegate OnPlayerCountChangeEvent;
-
-    void OnPlayerCountChangeEventHandler(string name)
-    {
-        m_UIManager.UpdateNames(name);
-    }
+    float[] arcLengths;
 
     private void Awake()
     {
@@ -50,38 +31,37 @@ public class PolePositionManager : NetworkBehaviour
             posSphere[i] = this.m_DebuggingSpheres[i].transform.position; // Se inicializa a la primera posición de la esfera en el circuito y se actualiza más abajo
         }
         m_UIManager = FindObjectOfType<UIManager>();
-        this.OnPlayerCountChangeEvent += OnPlayerCountChangeEventHandler;
     }
 
     private void Update()
     {
         if (m_Players.Count == 0)
             return;
-
         UpdateRaceProgress();
     }
 
     public void AddPlayer(PlayerInfo player)
     {
         m_Players.Add(player);
-
+        arcLengths = new float[m_Players.Count];
     }
-
+    
     private class PlayerInfoComparer : Comparer<PlayerInfo>
     {
         float[] m_ArcLengths;
 
-        public PlayerInfoComparer(float[] arcLengths)
+        public PlayerInfoComparer(float[] orden)
         {
-            m_ArcLengths = arcLengths;
+            m_ArcLengths = orden;
         }
 
         public override int Compare(PlayerInfo x, PlayerInfo y)
         {
-            if (this.m_ArcLengths[x.ID] > m_ArcLengths[y.ID])
+            Debug.Log(" X " + x.ID + " " + m_ArcLengths[x.ID]);
+            Debug.Log(" Y " + y.ID + " " + m_ArcLengths[y.ID]);
+
+            if (m_ArcLengths[x.ID] < m_ArcLengths[y.ID])
             {
-                //Debug.Log("x" +(int)this.m_ArcLengths[x.ID] + " 2 " + this.m_ArcLengths[x.ID]);
-                //Debug.Log("y" +(int)m_ArcLengths[y.ID] + " 2 " + m_ArcLengths[y.ID]);
                 return 1;
             }
             else {
@@ -89,55 +69,58 @@ public class PolePositionManager : NetworkBehaviour
             }
         }
     }
+    
+
 
     public void UpdateRaceProgress()
     {
-
-        // Update car arc-lengths
-        float[] arcLengths = new float[m_Players.Count];
-
-        for (int i = 0; i < m_Players.Count; ++i)
-        {
-            Debug.Log(m_Players[i].ID);
-            arcLengths[i] = ComputeCarArcLength(i);
-        }
+        ordenP = new List<PlayerInfo>();
+        float[] orden = new float[4];
         if (isServer)
         {
-            m_Players.Sort(new PlayerInfoComparer(arcLengths));
-        }
+            //Debug.Log("------------------------------------------");
+            for (int i = 0; i < m_Players.Count; i++)
+            {
+                orden[i] = arcLengths[i];
+                ordenP.Add( m_Players[i]);
+            }
 
-        myRaceOrder = " ";
-        int aux = 0;
-        foreach (var _player in m_Players)
-        {
-            myRaceOrder += _player.Name + " " + arcLengths[aux] + "\n";
-            aux++;
-        }
-        setRaceOrder("", myRaceOrder);
-        //RaceOrder = myRaceOrder;
-        
+            foreach (var _player in m_Players)
+            {
+                RpcComputeCarArcLength(_player.ID);
+                
+            }
 
+            for (int i = 0; i < arcLengths.Length; i++)
+            {
+                //Debug.Log("arclegths " + i + " ID " +m_Players[i].ID + "  Nombre "+ m_Players[i].Name + " "+ arcLengths[i]);
+                orden[i] = arcLengths[i];
+            }
 
-        /*
-        m_Players.Sort(new PlayerInfoComparer(arcLengths));
-        myRaceOrder = " ";
-        foreach (var _player in m_Players)
-        {
-            myRaceOrder += _player.Name + "\n";
+            ordenP.Sort(new PlayerInfoComparer(orden));
+
+            myRaceOrder = " ";
+            foreach (var _player in ordenP)
+            {
+                myRaceOrder += _player.Name + " " + arcLengths[_player.ID] + "\n";
+            }
+            for (int i = 0; i < arcLengths.Length; i++)
+            {
+                //Debug.Log("arclegths " + i + " ID " + m_Players[i].ID + "  Nombre " + m_Players[i].Name + " " + arcLengths[i]);
+            }
+            RpcSetRaceOrder("", myRaceOrder);
+
+            
         }
-        setRaceOrder("", myRaceOrder);
-         
-         */
-        //Debug.Log("El orden de carrera es: " + myRaceOrder);
     }
 
-    float ComputeCarArcLength(int ID)
+    [ClientRpc]
+    void RpcComputeCarArcLength(int ID)
     {
         // Compute the projection of the car position to the closest circuit 
         // path segment and accumulate the arc-length along of the car along
         // the circuit.
         Vector3 carPos = this.m_Players[ID].transform.position;
-
         int segIdx;
         float carDist;
         Vector3 carProj;
@@ -156,12 +139,11 @@ public class PolePositionManager : NetworkBehaviour
             minArcL += m_CircuitController.CircuitLength *
                        (m_Players[ID].CurrentLap - 1);
         }
-
-        return minArcL;
+        arcLengths[ID] = minArcL;
     }
-
-    void setRaceOrder(string old, string newOrder)
+    [ClientRpc]
+    void RpcSetRaceOrder(string old, string newOrder)
     {
-        RaceOrder = newOrder;
+        m_UIManager.UpdateNames(newOrder);
     }
 }
