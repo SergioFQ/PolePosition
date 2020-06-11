@@ -57,15 +57,15 @@ public class PolePositionManager : NetworkBehaviour
 
         public override int Compare(PlayerInfo x, PlayerInfo y)
         {
-            Debug.Log(" X " + x.ID + " " + m_ArcLengths[x.ID]);
-            Debug.Log(" Y " + y.ID + " " + m_ArcLengths[y.ID]);
+            //Debug.Log(" X " + x.ID + " " + m_ArcLengths[x.ID]);
+            //Debug.Log(" Y " + y.ID + " " + m_ArcLengths[y.ID]);
 
-            if (m_ArcLengths[x.ID] < m_ArcLengths[y.ID])
+            if (m_ArcLengths[x.ID] > m_ArcLengths[y.ID] || x.CurrentLap > y.CurrentLap)
             {
-                return 1;
+                return -1;
             }
             else {
-                return -1; 
+                return 1; 
             }
         }
     }
@@ -106,7 +106,7 @@ public class PolePositionManager : NetworkBehaviour
             }
             for (int i = 0; i < arcLengths.Length; i++)
             {
-                //Debug.Log("arclegths " + i + " ID " + m_Players[i].ID + "  Nombre " + m_Players[i].Name + " " + arcLengths[i]);
+                Debug.Log("arclegths " + i + " ID " + m_Players[i].ID + "  Nombre " + m_Players[i].Name + " " + arcLengths[i] + " Vuelta: " + m_Players[i].CurrentLap);
             }
             RpcSetRaceOrder("", myRaceOrder);
 

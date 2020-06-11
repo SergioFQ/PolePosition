@@ -28,12 +28,13 @@ public class PlayerController : NetworkBehaviour
     private float InputBrake { get; set; }
 
     private PlayerInfo m_PlayerInfo;
+    private UIManager m_UIManager;
     private WheelFrictionCurve frictionCurve;//creamos la curva de fricción para eliminar la deriva
     private Rigidbody m_Rigidbody;
     private float m_SteerHelper = 0.8f;
     Vector3 pos = new Vector3(0, 0, 0);
     private float m_CurrentSpeed = 0;
-    public int m_CurrentLap;
+    [SyncVar(hook = nameof(setLap))] public int m_CurrentLap;
     private PolePositionManager m_PolePositionManager;//usado para controlar cuando el jugador vuelca
     private CameraController m_cameraController;//usado para controlar cuando el jugador vuelca
     private bool debugUpsideDown = false;
@@ -53,6 +54,7 @@ public class PlayerController : NetworkBehaviour
 
     public event OnSpeedChangeDelegate OnSpeedChangeEvent;
 
+    /*
     private float Lap
     {
         get { return m_CurrentLap; }
@@ -63,11 +65,11 @@ public class PlayerController : NetworkBehaviour
                 OnLapChangeEvent(m_CurrentLap);
         }
     }
-
+    
     public delegate void OnLapChangeDelegate(int newVal);
 
     public event OnLapChangeDelegate OnLapChangeEvent;
-
+    */
 
     #endregion Variables
 
@@ -76,6 +78,7 @@ public class PlayerController : NetworkBehaviour
     public void Awake()
     {
         m_PolePositionManager = FindObjectOfType<PolePositionManager>();
+        m_UIManager = FindObjectOfType<UIManager>();
         m_cameraController = FindObjectOfType<CameraController>();
         m_Rigidbody = GetComponent<Rigidbody>();
         m_PlayerInfo = GetComponent<PlayerInfo>();
@@ -83,7 +86,6 @@ public class PlayerController : NetworkBehaviour
         frictionCurve = axleInfos[0].leftWheel.sidewaysFriction;
         frictionCurve.extremumSlip = 0.2f;
         pos = transform.position;
-        
     }
 
     public void Update()
@@ -92,7 +94,7 @@ public class PlayerController : NetworkBehaviour
         InputSteering = Input.GetAxis(("Horizontal"));
         InputBrake = Input.GetAxis("Jump");
         Speed = m_Rigidbody.velocity.magnitude;
-        Lap = m_CurrentLap;
+        
 
         //Debug volcar y spawnear cuando salimos de la pista
         if (Input.GetKeyUp(KeyCode.F))
@@ -344,6 +346,12 @@ public class PlayerController : NetworkBehaviour
         }
 
         CurrentRotation = transform.eulerAngles.y;
+    }
+
+    private void setLap(int old, int newLap)
+    {
+        m_PlayerInfo.CurrentLap = newLap;
+        //m_UIManager.UpdateLap(newLap);
     }
 
     #endregion

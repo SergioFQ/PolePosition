@@ -50,14 +50,7 @@ public class UIManager : MonoBehaviour
 
     public void UpdateLap(int lap)
     {
-        if (lap == -1)
-        {
-            textLaps.text = "Lap " + 0 + "/5";
-        }
-        else
-        {
-            textLaps.text = "Lap " + lap + "/5";
-        }
+        textLaps.text = "Lap " + lap + "/5";
     }
     public void UpdateNames(string name)
     {

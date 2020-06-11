@@ -54,6 +54,7 @@ public class SetupPlayer : NetworkBehaviour
             //setColour(0 , m_Colour);
         }
         m_PlayerInfo.ID = m_ID;
+        //m_PlayerInfo.CurrentLap = -1;
         m_PolePositionManager.AddPlayer(m_PlayerInfo);
         /*else
         {
@@ -87,7 +88,7 @@ public class SetupPlayer : NetworkBehaviour
         {
             m_PlayerController.enabled = true;
             m_PlayerController.OnSpeedChangeEvent += OnSpeedChangeEventHandler;
-            m_PlayerController.OnLapChangeEvent += OnLapChangeEventHandler;
+            //m_PlayerController.OnLapChangeEvent += OnLapChangeEventHandler;
             //ConfigureColor();
             ConfigureCamera();
         }
@@ -98,12 +99,13 @@ public class SetupPlayer : NetworkBehaviour
         m_UIManager.UpdateSpeed((int) speed * 5); // 5 for visualization purpose (km/h)
     }
 
+    /*
     void OnLapChangeEventHandler(int lap)
     {
         m_UIManager.UpdateLap(lap);
-        m_PlayerInfo.CurrentLap = lap;
+        //m_PlayerInfo.CurrentLap = lap;
     }
-
+    */
     void ConfigureCamera()
     {
         if (Camera.main != null) Camera.main.gameObject.GetComponent<CameraController>().m_Focus = this.gameObject;
