@@ -17,6 +17,7 @@ public class PolePositionManager : NetworkBehaviour
     [SyncVar(hook = nameof(RpcSetRaceOrder))] private string myRaceOrder = "";
     private UIManager m_UIManager;
     private float[] arcLengths;
+    public GameObject[] checkpoints;
 
     private void Awake()
     {

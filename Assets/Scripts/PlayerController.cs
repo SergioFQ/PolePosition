@@ -32,12 +32,13 @@ public class PlayerController : NetworkBehaviour
     private WheelFrictionCurve frictionCurve;//creamos la curva de fricción para eliminar la deriva
     private Rigidbody m_Rigidbody;
     private float m_SteerHelper = 0.8f;
-    Vector3 pos = new Vector3(0, 0, 0);
     private float m_CurrentSpeed = 0;
     [SyncVar(hook = nameof(RpcSetLap))] public int m_CurrentLap;
     private PolePositionManager m_PolePositionManager;//usado para controlar cuando el jugador vuelca
     private CameraController m_cameraController;//usado para controlar cuando el jugador vuelca
     private bool debugUpsideDown = false;
+    private Vector3 force;
+
     private float Speed
     {
         get { return m_CurrentSpeed; }
@@ -85,7 +86,7 @@ public class PlayerController : NetworkBehaviour
         m_CurrentLap = m_PlayerInfo.CurrentLap;
         frictionCurve = axleInfos[0].leftWheel.sidewaysFriction;
         frictionCurve.extremumSlip = 0.2f;
-        pos = transform.position;
+        //pos = transform.position;
     }
 
     public void Update()
@@ -225,9 +226,11 @@ public class PlayerController : NetworkBehaviour
      private void CrashSpawn()
     {
         m_UIManager.wrongWay.gameObject.SetActive(false);
-        transform.position = pos;
-        transform.LookAt(m_cameraController.nextPoint);
-        m_Rigidbody.velocity = new Vector3(0f, 0f, 0f);
+        Vector3 posAux = m_PolePositionManager.checkpoints[m_PlayerInfo.LastPoint].transform.position;
+        m_Rigidbody.velocity = Vector3.zero;
+        m_Rigidbody.angularVelocity = Vector3.zero;
+        transform.position = new Vector3(posAux.x,posAux.y + 3, posAux.z);       
+        transform.LookAt(m_PolePositionManager.checkpoints[(m_PlayerInfo.LastPoint + 1) % m_PolePositionManager.checkpoints.Length].transform.position);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -236,6 +239,7 @@ public class PlayerController : NetworkBehaviour
         if (collision.transform.tag == "OutRace")
         {
             //contador para que si a los 2 segundos o asi sigues golpeando que llame a la funcion
+            force = m_Rigidbody.velocity;
                 CrashSpawn();
             
         }
@@ -252,14 +256,13 @@ public class PlayerController : NetworkBehaviour
             if ((id == m_PlayerInfo.LastPoint + 1) || (id == 0 && m_PlayerInfo.LastPoint==12))
             {
                 m_PlayerInfo.LastPoint = id;
-                pos = other.transform.position;
+                //pos = other.transform.position;
             }
             if (id <= m_PlayerInfo.LastPoint - 1 || (m_PlayerInfo.LastPoint < 3 && id > 8))
             {
-                Debug.Log("WORNG WAY");
                 m_UIManager.wrongWay.gameObject.SetActive(true);
             }
-            if (id <= m_PlayerInfo.LastPoint - 3)
+            if (id <= m_PlayerInfo.LastPoint - 3 || (m_PlayerInfo.LastPoint <= 3 && id >= 8)) //comprobamos el hacer mal el recorrido
             {
                 //Debug.Log("Habria que hacer Spawn");
                 CrashSpawn();
