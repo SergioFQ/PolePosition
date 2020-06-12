@@ -26,6 +26,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Text textLaps;
     [SerializeField] private Text textPosition;
     [SerializeField] private Text textColor;
+    [SerializeField] public RawImage wrongWay;
 
     public int colorNumber = 0;
     public string playerName = "";

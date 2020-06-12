@@ -224,6 +224,7 @@ public class PlayerController : NetworkBehaviour
     }
      private void CrashSpawn()
     {
+        m_UIManager.wrongWay.gameObject.SetActive(false);
         transform.position = pos;
         transform.LookAt(m_cameraController.nextPoint);
         m_Rigidbody.velocity = new Vector3(0f, 0f, 0f);
@@ -253,8 +254,12 @@ public class PlayerController : NetworkBehaviour
                 m_PlayerInfo.LastPoint = id;
                 pos = other.transform.position;
             }
-
-            if (id <= m_PlayerInfo.LastPoint - 2)
+            if (id <= m_PlayerInfo.LastPoint - 1 || (m_PlayerInfo.LastPoint < 3 && id > 8))
+            {
+                Debug.Log("WORNG WAY");
+                m_UIManager.wrongWay.gameObject.SetActive(true);
+            }
+            if (id <= m_PlayerInfo.LastPoint - 3)
             {
                 //Debug.Log("Habria que hacer Spawn");
                 CrashSpawn();
