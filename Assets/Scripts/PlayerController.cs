@@ -226,7 +226,16 @@ public class PlayerController : NetworkBehaviour
      private void CrashSpawn()
     {
         m_UIManager.wrongWay.gameObject.SetActive(false);
-        Vector3 posAux = m_PolePositionManager.checkpoints[m_PlayerInfo.LastPoint].transform.position;
+        Vector3 posAux;
+        if (m_PlayerInfo.LastPoint == -1)
+        {
+            posAux = m_PolePositionManager.checkpoints[0].transform.position;
+        }
+        else
+        {
+
+            posAux = m_PolePositionManager.checkpoints[m_PlayerInfo.LastPoint].transform.position;
+        }
         m_Rigidbody.velocity = Vector3.zero;
         m_Rigidbody.angularVelocity = Vector3.zero;
         transform.position = new Vector3(posAux.x,posAux.y + 3, posAux.z);       
@@ -258,8 +267,9 @@ public class PlayerController : NetworkBehaviour
                 m_PlayerInfo.LastPoint = id;
                 //pos = other.transform.position;
             }
-            if (id <= m_PlayerInfo.LastPoint - 1 || (m_PlayerInfo.LastPoint < 3 && id > 8))
+            if (id <= m_PlayerInfo.LastPoint - 1)
             {
+                //Debug.Log(m_PlayerInfo.LastPoint + " " + id);
                 m_UIManager.wrongWay.gameObject.SetActive(true);
             }
             if (id <= m_PlayerInfo.LastPoint - 3 || (m_PlayerInfo.LastPoint <= 3 && id >= 8)) //comprobamos el hacer mal el recorrido
