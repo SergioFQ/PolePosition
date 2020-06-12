@@ -34,7 +34,7 @@ public class PlayerController : NetworkBehaviour
     private float m_SteerHelper = 0.8f;
     Vector3 pos = new Vector3(0, 0, 0);
     private float m_CurrentSpeed = 0;
-    [SyncVar(hook = nameof(setLap))] public int m_CurrentLap;
+    [SyncVar(hook = nameof(RpcSetLap))] public int m_CurrentLap;
     private PolePositionManager m_PolePositionManager;//usado para controlar cuando el jugador vuelca
     private CameraController m_cameraController;//usado para controlar cuando el jugador vuelca
     private bool debugUpsideDown = false;
@@ -111,7 +111,7 @@ public class PlayerController : NetworkBehaviour
         float steering = maxSteeringAngle * InputSteering;
         foreach (AxleInfo axleInfo in axleInfos)
         {
-
+            
             if (axleInfo.steering)
             {
                 axleInfo.leftWheel.steerAngle = steering;
@@ -348,10 +348,14 @@ public class PlayerController : NetworkBehaviour
         CurrentRotation = transform.eulerAngles.y;
     }
 
-    private void setLap(int old, int newLap)
+    [ClientRpc]
+    private void RpcSetLap(int old, int newLap)
     {
         m_PlayerInfo.CurrentLap = newLap;
-        //m_UIManager.UpdateLap(newLap);
+        if (isLocalPlayer)
+        {
+            m_UIManager.UpdateLap(newLap);
+        }
     }
 
     #endregion

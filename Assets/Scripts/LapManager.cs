@@ -5,13 +5,13 @@ using UnityEngine;
 public class LapManager : MonoBehaviour
 {
 
-    private UIManager m_UIManager;
+    //private UIManager m_UIManager;
 
     void Awake()
     {
         /*m_PlayerInfo = FindObjectOfType<PlayerInfo>();
         Debug.Log(m_PlayerInfo.Name);*/
-        m_UIManager = FindObjectOfType<UIManager>();
+        //m_UIManager = FindObjectOfType<UIManager>();
     }
 
     // Update is called once per frame
@@ -25,8 +25,9 @@ public class LapManager : MonoBehaviour
         if (other.GetComponent<PlayerInfo>().LastPoint == 12)
         {
             Debug.Log("Bien");
-            other.GetComponent<PlayerInfo>().LastPoint = 0;
+            other.GetComponent<PlayerInfo>().LastPoint = - 1;
             other.GetComponent<PlayerController>().m_CurrentLap++;
+
             //m_UIManager.UpdateLap(other.GetComponent<PlayerController>().m_CurrentLap);
         }
         /*else

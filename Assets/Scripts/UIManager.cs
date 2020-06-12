@@ -41,6 +41,7 @@ public class UIManager : MonoBehaviour
         buttonServer.onClick.AddListener(() => StartServer());
         buttonColor.onClick.AddListener(() => SelectColor());
         ActivateMainMenu();
+        textLaps.text = "Lap 0/5";
     }
 
     public void UpdateSpeed(int speed)

@@ -16,7 +16,7 @@ public class PolePositionManager : NetworkBehaviour
     private GameObject[] m_DebuggingSpheres;
     [SyncVar(hook = nameof(RpcSetRaceOrder))] private string myRaceOrder = "";
     private UIManager m_UIManager;
-    float[] arcLengths;
+    private float[] arcLengths;
 
     private void Awake()
     {
@@ -57,21 +57,24 @@ public class PolePositionManager : NetworkBehaviour
 
         public override int Compare(PlayerInfo x, PlayerInfo y)
         {
-            //Debug.Log(" X " + x.ID + " " + m_ArcLengths[x.ID]);
-            //Debug.Log(" Y " + y.ID + " " + m_ArcLengths[y.ID]);
-
             if (m_ArcLengths[x.ID] > m_ArcLengths[y.ID] || x.CurrentLap > y.CurrentLap)
             {
+                if (x.CurrentLap == y.CurrentLap && (x.LastPoint == -1 && y.LastPoint != -1))
+                {
+                    return 1;
+                }
+
+                
                 return -1;
             }
             else {
+
+
                 return 1; 
             }
         }
     }
     
-
-
     public void UpdateRaceProgress()
     {
         ordenP = new List<PlayerInfo>();
@@ -102,11 +105,11 @@ public class PolePositionManager : NetworkBehaviour
             myRaceOrder = " ";
             foreach (var _player in ordenP)
             {
-                myRaceOrder += _player.Name + " " + arcLengths[_player.ID] + "\n";
+                myRaceOrder += _player.Name + /*" " + arcLengths[_player.ID] +*/ "\n";
             }
             for (int i = 0; i < arcLengths.Length; i++)
             {
-                Debug.Log("arclegths " + i + " ID " + m_Players[i].ID + "  Nombre " + m_Players[i].Name + " " + arcLengths[i] + " Vuelta: " + m_Players[i].CurrentLap);
+                // Debug.Log("arclegths " + i + " ID " + m_Players[i].ID + "  Nombre " + m_Players[i].Name + " " + arcLengths[i] + " Vuelta: " + m_Players[i].CurrentLap);
             }
             RpcSetRaceOrder("", myRaceOrder);
 
@@ -130,7 +133,7 @@ public class PolePositionManager : NetworkBehaviour
 
         this.m_DebuggingSpheres[ID].transform.position = carProj;
         posSphere[ID] = this.m_DebuggingSpheres[ID].transform.position; //actualización de la posición de la esfera por ID, esto sí funciona
-        if (this.m_Players[ID].CurrentLap == 0 || this.m_Players[ID].CurrentLap == -1)
+        if (this.m_Players[ID].CurrentLap == 0)
         {
             minArcL -= m_CircuitController.CircuitLength;
         }
@@ -144,6 +147,7 @@ public class PolePositionManager : NetworkBehaviour
     [ClientRpc]
     void RpcSetRaceOrder(string old, string newOrder)
     {
+        
         m_UIManager.UpdateNames(newOrder);
     }
 }

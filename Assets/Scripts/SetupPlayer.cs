@@ -47,13 +47,14 @@ public class SetupPlayer : NetworkBehaviour
             CmdSelectName((m_UIManager.playerName == "") ? ("Player" + m_ID) : (m_UIManager.playerName));
             //setName("",m_Name);
             m_PlayerInfo.CurrentLap = 0;
-            m_PlayerInfo.LastPoint = -1;
+            //m_PlayerInfo.LastPoint = -1;
             //m_PlayerInfo.ColourID = m_UIManager.colorNumber;
             //m_Colour = m_UIManager.colorNumber;
             CmdSelectColor(m_UIManager.colorNumber);
             //setColour(0 , m_Colour);
         }
         m_PlayerInfo.ID = m_ID;
+        m_PlayerInfo.LastPoint = -1;
         //m_PlayerInfo.CurrentLap = -1;
         m_PolePositionManager.AddPlayer(m_PlayerInfo);
         /*else
