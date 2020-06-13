@@ -21,4 +21,6 @@ public class PlayerInfo : MonoBehaviour
     {
         return Name;
     }
+
+    public bool isReady { get; set; }
 }

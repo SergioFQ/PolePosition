@@ -13,6 +13,7 @@ public class SetupPlayer : NetworkBehaviour
     [SyncVar] private int m_ID;
     [SyncVar (hook = nameof(setName))] private string m_Name;
     [SyncVar (hook = nameof(setColour))] private int m_Colour;
+    [SyncVar(hook = nameof(SetReady))] private bool m_Ready;
     private UIManager m_UIManager;
     private NetworkManager m_NetworkManager;
     private PlayerController m_PlayerController;
@@ -52,9 +53,11 @@ public class SetupPlayer : NetworkBehaviour
             //m_Colour = m_UIManager.colorNumber;
             CmdSelectColor(m_UIManager.colorNumber);
             //setColour(0 , m_Colour);
+            m_PolePositionManager.m_SetUpPlayer = this;
         }
         m_PlayerInfo.ID = m_ID;
         m_PlayerInfo.LastPoint = -1;
+        m_PlayerInfo.isReady = false;
         //m_PlayerInfo.CurrentLap = -1;
         m_PolePositionManager.AddPlayer(m_PlayerInfo);
         /*else
@@ -89,7 +92,6 @@ public class SetupPlayer : NetworkBehaviour
         {
             m_PlayerController.enabled = true;
             m_PlayerController.OnSpeedChangeEvent += OnSpeedChangeEventHandler;
-            //m_PlayerController.OnLapChangeEvent += OnLapChangeEventHandler;
             //ConfigureColor();
             ConfigureCamera();
         }
@@ -117,6 +119,12 @@ public class SetupPlayer : NetworkBehaviour
         m_PlayerInfo.Name = newName;
     }
 
+    void SetReady(bool old, bool newReady)
+    {
+        m_PlayerInfo.isReady = newReady;
+    }
+
+
     void setColour(int old, int newColour)
     {
         m_PlayerInfo.ColourID = newColour;
@@ -141,7 +149,13 @@ public class SetupPlayer : NetworkBehaviour
                 break;
         }
     }
-
+    [Command]
+    public void CmdStartRace()
+    {
+        Debug.Log( "llamada del cliente");
+        m_PolePositionManager.RpcUpdateNumPlayersReady();
+        //Debug.Log(numPlayersReady);
+    }
     [Command]
     void CmdSelectName(string name)
     {

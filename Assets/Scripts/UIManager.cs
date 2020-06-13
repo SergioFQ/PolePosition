@@ -10,6 +10,8 @@ public class UIManager : MonoBehaviour
     public bool showGUI = true;
     private PolePositionManager m_polePositionManager;
     private NetworkManager m_NetworkManager;
+    private SetupPlayer m_SetUpPlayer;
+    private PlayerController m_PlayerController;
 
     [Header("Main Menu")] [SerializeField] private GameObject mainMenu;
     [SerializeField] private Button buttonHost;
@@ -20,6 +22,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private InputField inputFieldName;
     public int colorNumber = 0;
     public string playerName = "";
+    public bool ready = false;
 
     [Header("In-Game HUD")] [SerializeField]
     private GameObject inGameHUD;
@@ -38,6 +41,8 @@ public class UIManager : MonoBehaviour
     {
         m_NetworkManager = FindObjectOfType<NetworkManager>();
         m_polePositionManager = FindObjectOfType<PolePositionManager>();
+        m_SetUpPlayer = FindObjectOfType<SetupPlayer>();
+        m_PlayerController = FindObjectOfType<PlayerController>();
     }
 
     private void Start()
@@ -53,9 +58,11 @@ public class UIManager : MonoBehaviour
 
     private void StartRace()
     {
-
         buttonReady.GetComponent<Image>().color = Color.green;
-        m_polePositionManager.StartRace();
+        //Debug.Log(m_PlayerController.topSpeed);
+        //m_SetUpPlayer.CmdSetReady();
+        m_polePositionManager.StartRaceCall();
+        //m_polePositionManager.numPlayersReady++;
     }
 
     public void UpdateSpeed(int speed)

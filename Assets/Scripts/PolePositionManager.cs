@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class PolePositionManager : NetworkBehaviour
 {
-    public int numPlayers;
+    public int numPlayersReady;
     public NetworkManager networkManager;
     public Vector3[] posSphere; //vector publico que guardaría la posición de las esferas
     private readonly List<PlayerInfo> m_Players = new List<PlayerInfo>(4);
@@ -15,10 +15,12 @@ public class PolePositionManager : NetworkBehaviour
     private CircuitController m_CircuitController;
     private PlayerController m_playerController;
     private GameObject[] m_DebuggingSpheres;
-    [SyncVar(hook = nameof(RpcSetRaceOrder))] private string myRaceOrder = "";
+    [SyncVar(hook = nameof(SetRaceOrder))] private string myRaceOrder = "";
     private UIManager m_UIManager;
     private float[] arcLengths;
     public GameObject[] checkpoints;
+    private PlayerInfo m_PlayerInfo; 
+    public SetupPlayer m_SetUpPlayer;
 
     private void Awake()
     {
@@ -26,7 +28,7 @@ public class PolePositionManager : NetworkBehaviour
         if (m_CircuitController == null) m_CircuitController = FindObjectOfType<CircuitController>();
         posSphere = new Vector3[4];
         m_playerController = FindObjectOfType<PlayerController>();
-        m_DebuggingSpheres = new GameObject[networkManager.maxConnections]; 
+        m_DebuggingSpheres = new GameObject[networkManager.maxConnections];
         for (int i = 0; i < networkManager.maxConnections; ++i)
         {
             m_DebuggingSpheres[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -34,6 +36,8 @@ public class PolePositionManager : NetworkBehaviour
             posSphere[i] = this.m_DebuggingSpheres[i].transform.position; // Se inicializa a la primera posición de la esfera en el circuito y se actualiza más abajo
         }
         m_UIManager = FindObjectOfType<UIManager>();
+        //m_SetUpPlayer = FindObjectOfType<SetupPlayer>();
+        m_PlayerInfo = GetComponent<PlayerInfo>();
     }
 
     private void Update()
@@ -47,8 +51,9 @@ public class PolePositionManager : NetworkBehaviour
     {
         m_Players.Add(player);
         arcLengths = new float[m_Players.Count];
+
     }
-    
+
     private class PlayerInfoComparer : Comparer<PlayerInfo>
     {
         float[] m_ArcLengths;
@@ -67,17 +72,17 @@ public class PolePositionManager : NetworkBehaviour
                     return 1;
                 }
 
-                
+
                 return -1;
             }
             else {
 
 
-                return 1; 
+                return 1;
             }
         }
     }
-    
+
     public void UpdateRaceProgress()
     {
         ordenP = new List<PlayerInfo>();
@@ -88,13 +93,13 @@ public class PolePositionManager : NetworkBehaviour
             for (int i = 0; i < m_Players.Count; i++)
             {
                 orden[i] = arcLengths[i];
-                ordenP.Add( m_Players[i]);
+                ordenP.Add(m_Players[i]);
             }
 
             foreach (var _player in m_Players)
             {
                 RpcComputeCarArcLength(_player.ID);
-                
+
             }
 
             for (int i = 0; i < arcLengths.Length; i++)
@@ -109,24 +114,71 @@ public class PolePositionManager : NetworkBehaviour
             foreach (var _player in ordenP)
             {
                 myRaceOrder += _player.Name + /*" " + arcLengths[_player.ID] +*/ "\n";
+
             }
+            for (int i = 0; i < m_Players.Count; i++)
+            {
+                //Debug.Log("I" + i + " ID " + m_Players[i].ID + "  Nombre " + m_Players[i].Name);
+            }
+
             for (int i = 0; i < arcLengths.Length; i++)
             {
-                // Debug.Log("arclegths " + i + " ID " + m_Players[i].ID + "  Nombre " + m_Players[i].Name + " " + arcLengths[i] + " Vuelta: " + m_Players[i].CurrentLap);
+                //Debug.Log("arclegths " + i + " ID " + m_Players[i].ID + "  Nombre " + m_Players[i].Name + " " + arcLengths[i] + " Vuelta: " + m_Players[i].CurrentLap);
             }
-            RpcSetRaceOrder("", myRaceOrder);
+            SetRaceOrder("", myRaceOrder);
 
-            
+
         }
     }
-    //Una vez los jugadores seleccionen "Ready" se llamará a este método y empezará la carrera
-    public void StartRace()
+    public void StartRaceCall()
     {
-        //activamos todos los coches
+        if (isServer)
+        {
+            RpcUpdateNumPlayersReady();
+        }
+        else
+        {
+            m_SetUpPlayer.CmdStartRace();
+        }
+    }
+
+    [ClientRpc]
+    public void RpcUpdateNumPlayersReady()
+    {
+        numPlayersReady++;
+        StartRace(0,0);
+    }
+    
+
+
+    //Una vez los jugadores seleccionen "Ready" se llamará a este método y empezará la carrera
+    //[ClientRpc]
+    public void StartRace(int old, int newV)
+    {
+        /*bool activado = false;
         foreach (var player in m_Players)
         {
-            player.GetComponent<PlayerController>().isReady = true;
-            m_UIManager.deactivateReadyMenu();
+            if(!player.GetComponent<PlayerInfo>().isReady && !activado)
+            {
+                player.GetComponent<PlayerInfo>().isReady = true;
+            }
+        }
+        
+        int aux = 0;
+        foreach (var player in m_Players)
+        {
+            if (player.GetComponent<UIManager>().ready)
+                aux++;
+        }*/
+        Debug.Log(numPlayersReady);
+        if (numPlayersReady >= m_Players.Count)
+        {
+            //activamos todos los coches
+            foreach (var player in m_Players)
+            {
+                player.GetComponent<PlayerController>().isReady = true;
+                m_UIManager.deactivateReadyMenu();
+            }
         }
     }
 
@@ -157,10 +209,10 @@ public class PolePositionManager : NetworkBehaviour
         }
         arcLengths[ID] = minArcL;
     }
-    [ClientRpc]
-    void RpcSetRaceOrder(string old, string newOrder)
+    void SetRaceOrder(string old, string newOrder)
     {
         
         m_UIManager.UpdateNames(newOrder);
     }
+
 }

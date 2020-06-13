@@ -15,7 +15,7 @@ public class CameraController : MonoBehaviour
 
     private Vector3 m_Direction = Vector3.zero;
     private Vector3 pathDir;
-    public Vector3 nextPoint;//siguiente punto del circuito
+    //public Vector3 nextPoint;//siguiente punto del circuito
     private Camera mainCamera;
 
     // Start is called before the first frame update
@@ -43,7 +43,7 @@ public class CameraController : MonoBehaviour
                 m_Circuit.ComputeClosestPointArcLength(m_Focus.transform.position, out segIdx, out carProj,
                     out carDist);
 
-                pathDir = -m_Circuit.GetSegment(segIdx, out nextPoint);//pasamos el vector del siguiente punto como referencia para poder saber cual es
+                pathDir = -m_Circuit.GetSegment(segIdx);
                 pathDir = new Vector3(pathDir.x, 0f, pathDir.z);
                 pathDir.Normalize();
 
