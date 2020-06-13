@@ -301,6 +301,7 @@ MonoBehaviour:
   downForce: 1000
   slipLimit: 0.2
   m_CurrentLap: -1
+  isReady: 0
 --- !u!114 &6346869062069434778
 MonoBehaviour:
   m_ObjectHideFlags: 0

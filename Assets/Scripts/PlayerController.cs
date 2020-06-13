@@ -37,7 +37,7 @@ public class PlayerController : NetworkBehaviour
     private PolePositionManager m_PolePositionManager;//usado para controlar cuando el jugador vuelca
     private CameraController m_cameraController;//usado para controlar cuando el jugador vuelca
     private bool debugUpsideDown = false;
-    private Vector3 force;
+    public bool isReady = false;//variable que se usará para activar todos los coches a la vez
 
     private float Speed
     {
@@ -119,7 +119,7 @@ public class PlayerController : NetworkBehaviour
                 axleInfo.rightWheel.steerAngle = steering;
             }
 
-            if (axleInfo.motor)
+            if (axleInfo.motor && isReady)
             {
                 if (InputAcceleration > float.Epsilon)
                 {
@@ -248,7 +248,6 @@ public class PlayerController : NetworkBehaviour
         if (collision.transform.tag == "OutRace")
         {
             //contador para que si a los 2 segundos o asi sigues golpeando que llame a la funcion
-            force = m_Rigidbody.velocity;
                 CrashSpawn();
             
         }

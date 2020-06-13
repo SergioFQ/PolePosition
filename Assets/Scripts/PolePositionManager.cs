@@ -9,10 +9,11 @@ public class PolePositionManager : NetworkBehaviour
 {
     public int numPlayers;
     public NetworkManager networkManager;
-    public Vector3[] posSphere; //vector publico que guardaría la posición de las esferas aunque en teoría solo se necesitaría la propia
+    public Vector3[] posSphere; //vector publico que guardaría la posición de las esferas
     private readonly List<PlayerInfo> m_Players = new List<PlayerInfo>(4);
     private List<PlayerInfo> ordenP = new List<PlayerInfo>(4);
     private CircuitController m_CircuitController;
+    private PlayerController m_playerController;
     private GameObject[] m_DebuggingSpheres;
     [SyncVar(hook = nameof(RpcSetRaceOrder))] private string myRaceOrder = "";
     private UIManager m_UIManager;
@@ -24,6 +25,7 @@ public class PolePositionManager : NetworkBehaviour
         if (networkManager == null) networkManager = FindObjectOfType<NetworkManager>();
         if (m_CircuitController == null) m_CircuitController = FindObjectOfType<CircuitController>();
         posSphere = new Vector3[4];
+        m_playerController = FindObjectOfType<PlayerController>();
         m_DebuggingSpheres = new GameObject[networkManager.maxConnections]; 
         for (int i = 0; i < networkManager.maxConnections; ++i)
         {
@@ -115,6 +117,16 @@ public class PolePositionManager : NetworkBehaviour
             RpcSetRaceOrder("", myRaceOrder);
 
             
+        }
+    }
+    //Una vez los jugadores seleccionen "Ready" se llamará a este método y empezará la carrera
+    public void StartRace()
+    {
+        //activamos todos los coches
+        foreach (var player in m_Players)
+        {
+            player.GetComponent<PlayerController>().isReady = true;
+            m_UIManager.deactivateReadyMenu();
         }
     }
 

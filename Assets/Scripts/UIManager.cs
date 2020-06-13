@@ -17,7 +17,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button buttonServer;
     [SerializeField] private InputField inputFieldIP;
     [SerializeField] private Button buttonColor;
-    [SerializeField] private InputField inputFieldName; 
+    [SerializeField] private InputField inputFieldName;
+    public int colorNumber = 0;
+    public string playerName = "";
 
     [Header("In-Game HUD")] [SerializeField]
     private GameObject inGameHUD;
@@ -28,11 +30,14 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Text textColor;
     [SerializeField] public RawImage wrongWay;
 
-    public int colorNumber = 0;
-    public string playerName = "";
+    [Header("Ready Menu")] [SerializeField] private GameObject readyMenu; //facilitamos la visualización del inspector poniendo este header
+    [SerializeField] private Button buttonReady;
+
+    
     private void Awake()
     {
         m_NetworkManager = FindObjectOfType<NetworkManager>();
+        m_polePositionManager = FindObjectOfType<PolePositionManager>();
     }
 
     private void Start()
@@ -41,8 +46,16 @@ public class UIManager : MonoBehaviour
         buttonClient.onClick.AddListener(() => StartClient());
         buttonServer.onClick.AddListener(() => StartServer());
         buttonColor.onClick.AddListener(() => SelectColor());
+        buttonReady.onClick.AddListener(() => StartRace());
         ActivateMainMenu();
         textLaps.text = "Lap 0/5";
+    }
+
+    private void StartRace()
+    {
+
+        buttonReady.GetComponent<Image>().color = Color.green;
+        m_polePositionManager.StartRace();
     }
 
     public void UpdateSpeed(int speed)
@@ -63,12 +76,14 @@ public class UIManager : MonoBehaviour
     {
         mainMenu.SetActive(true);
         inGameHUD.SetActive(false);
+        readyMenu.SetActive(false);
     }
 
     private void ActivateInGameHUD()
     {
         mainMenu.SetActive(false);
         inGameHUD.SetActive(true);
+        readyMenu.SetActive(true);
     }
 
     private void StartHost()
@@ -90,6 +105,11 @@ public class UIManager : MonoBehaviour
     {
         m_NetworkManager.StartServer();
         ActivateInGameHUD();
+    }
+
+    public void deactivateReadyMenu()
+    {
+        readyMenu.SetActive(false);
     }
 
     //cambiamos el color del coche dando click al botón de color las veces que sean necesarias hasta ver que aparece el texto del color deseado. Los colores son (ROJO, VERDE, AMARILLO Y BLANCO)
