@@ -33,7 +33,7 @@ public class PlayerController : NetworkBehaviour
     private Rigidbody m_Rigidbody;
     private float m_SteerHelper = 0.8f;
     private float m_CurrentSpeed = 0;
-    [SyncVar(hook = nameof(RpcSetLap))] public int m_CurrentLap;
+    [SyncVar(hook = nameof(SetLap))] public int m_CurrentLap;
     private PolePositionManager m_PolePositionManager;//usado para controlar cuando el jugador vuelca
     private CameraController m_cameraController;//usado para controlar cuando el jugador vuelca
     private bool debugUpsideDown = false;
@@ -366,9 +366,8 @@ public class PlayerController : NetworkBehaviour
 
         CurrentRotation = transform.eulerAngles.y;
     }
-
-    [ClientRpc]
-    private void RpcSetLap(int old, int newLap)
+    
+    private void SetLap(int old, int newLap)
     {
         m_PlayerInfo.CurrentLap = newLap;
         if (isLocalPlayer)

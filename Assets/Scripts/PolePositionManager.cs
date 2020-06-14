@@ -133,7 +133,6 @@ public class PolePositionManager : NetworkBehaviour
 
 
         }
-        Debug.Log(namesRanking);
     }
 
     public void startRace()
@@ -215,6 +214,7 @@ public class PolePositionManager : NetworkBehaviour
         }
         else
         {
+            m_SetUpPlayer.m_PlayerController.posRanking = posRanking[ordenRanking].transform.position;
             m_SetUpPlayer.CmdUpdateOrdenRanking();
         }
         //return target.transform.position;
