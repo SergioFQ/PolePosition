@@ -40,6 +40,7 @@ public class PlayerController : NetworkBehaviour
     public bool isReady = false;//variable que se usará para activar todos los coches a la vez
     public Vector3 posRanking;
 
+
     private float Speed
     {
         get { return m_CurrentSpeed; }

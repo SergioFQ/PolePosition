@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class LapManager : MonoBehaviour
 {
-
-    //private UIManager m_UIManager;
+    [SerializeField] private GameObject posCamera;
+    [SerializeField] private GameObject targetCamera;
 
     void Awake()
     {
@@ -29,6 +29,9 @@ public class LapManager : MonoBehaviour
             other.GetComponent<PlayerController>().m_CurrentLap++;
             if (other.GetComponent<PlayerController>().m_CurrentLap == 1)
             {
+                other.GetComponent<SetupPlayer>().UnfocusCamera();
+                Camera.main.gameObject.transform.position = posCamera.transform.position;
+                Camera.main.gameObject.transform.LookAt(targetCamera.transform.position);
                 other.GetComponent<PlayerController>().m_UIManager.ActivateGameOver();
                 other.GetComponent<PlayerController>().SetInactive();
             }

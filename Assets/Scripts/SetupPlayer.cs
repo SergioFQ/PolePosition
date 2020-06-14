@@ -97,6 +97,10 @@ public class SetupPlayer : NetworkBehaviour
         if (Camera.main != null) Camera.main.gameObject.GetComponent<CameraController>().m_Focus = this.gameObject;
     }
 
+    public void UnfocusCamera()
+    {
+        Camera.main.gameObject.GetComponent<CameraController>().m_Focus = null;
+    }
     void setName(string old, string newName)
     {
         m_PlayerInfo.Name = newName;
