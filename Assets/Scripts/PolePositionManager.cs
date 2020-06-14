@@ -24,6 +24,8 @@ public class PolePositionManager : NetworkBehaviour
     //private PlayerInfo m_PlayerInfo; 
     public SetupPlayer m_SetUpPlayer;
 
+    public int ordenRanking = 0;
+
     private void Awake()
     {
         if (networkManager == null) networkManager = FindObjectOfType<NetworkManager>();
@@ -190,9 +192,11 @@ public class PolePositionManager : NetworkBehaviour
         m_UIManager.UpdateNames(newOrder);
     }
 
-    void SetPosInRanking()
+    public Vector3 SetPosInRanking()
     {
-
+        m_SetUpPlayer.m_PlayerController.posRanking = posRanking[ordenRanking].transform.position;
+        ordenRanking++;
+        return target.transform.position;
     }
 
 }

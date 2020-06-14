@@ -27,7 +27,7 @@ public class LapManager : MonoBehaviour
             Debug.Log("Bien");
             other.GetComponent<PlayerInfo>().LastPoint = - 1;
             other.GetComponent<PlayerController>().m_CurrentLap++;
-            if (other.GetComponent<PlayerController>().m_CurrentLap == 6)
+            if (other.GetComponent<PlayerController>().m_CurrentLap == 1)
             {
                 other.GetComponent<PlayerController>().m_UIManager.ActivateGameOver();
                 other.GetComponent<PlayerController>().SetInactive();

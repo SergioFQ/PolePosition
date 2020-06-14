@@ -38,7 +38,7 @@ public class PlayerController : NetworkBehaviour
     private CameraController m_cameraController;//usado para controlar cuando el jugador vuelca
     private bool debugUpsideDown = false;
     public bool isReady = false;//variable que se usará para activar todos los coches a la vez
-    public GameObject[] posRanking;
+    public Vector3 posRanking;
 
     private float Speed
     {
@@ -190,7 +190,7 @@ public class PlayerController : NetworkBehaviour
 
     private void SavingPosition()
     {
-        if (debugUpsideDown)
+        if (debugUpsideDown && isReady)
         {
             transform.Rotate(0, 0, 90);
             debugUpsideDown = false;
@@ -199,7 +199,7 @@ public class PlayerController : NetworkBehaviour
         //si he chocado
 
         //si esta volcado
-        if (Vector3.Dot(transform.up, Vector3.down) > 0)
+        if (Vector3.Dot(transform.up, Vector3.down) > 0 && isReady)
         {
             /*Debug.Log("Player antes del golpe: " + transform.position);
             Debug.Log("Player ha vuelto: " + pos);
@@ -382,7 +382,9 @@ public class PlayerController : NetworkBehaviour
         friction.extremumSlip = 100;
         m_Rigidbody.velocity = Vector3.zero;
         m_Rigidbody.angularVelocity = Vector3.zero;
-        transform.position = new Vector3(0, 2, -6);
+        Vector3 target = m_PolePositionManager.SetPosInRanking();
+        transform.LookAt(target);
+        transform.position = posRanking;
         foreach (var axleInfo in axleInfos)
         {
             axleInfo.leftWheel.motorTorque = 0;
@@ -394,6 +396,8 @@ public class PlayerController : NetworkBehaviour
         }
         isReady = false;
     }
+
+
 
     #endregion
 }
