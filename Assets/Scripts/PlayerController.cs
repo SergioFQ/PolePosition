@@ -38,7 +38,6 @@ public class PlayerController : NetworkBehaviour
     private CameraController m_cameraController;//usado para controlar cuando el jugador vuelca
     private bool debugUpsideDown = false;
     public bool isReady = false;//variable que se usará para activar todos los coches a la vez
-    public GameObject[] posRanking;
 
     private float Speed
     {

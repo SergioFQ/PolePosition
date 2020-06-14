@@ -101,6 +101,7 @@ public class UIManager : MonoBehaviour
         mainMenu.SetActive(false);
         inGameHUD.SetActive(false);
         readyMenu.SetActive(false);
+        gameOverMenu.SetActive(true);
         Debug.Log("GameOver");
     }
 
