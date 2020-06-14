@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
@@ -35,6 +36,9 @@ public class UIManager : MonoBehaviour
     [Header("Ready Menu")] [SerializeField] private GameObject readyMenu; //facilitamos la visualización del inspector poniendo este header
     [SerializeField] private Button buttonReady;
 
+    [Header("Game Over Menu")] [SerializeField] private GameObject gameOverMenu;
+    [SerializeField] private Text finalPositions;
+    [SerializeField] private Button buttonRestart;
     
     private void Awake()
     {
@@ -48,10 +52,15 @@ public class UIManager : MonoBehaviour
         buttonServer.onClick.AddListener(() => StartServer());
         buttonColor.onClick.AddListener(() => SelectColor());
         buttonReady.onClick.AddListener(() => StartRace());
+        buttonRestart.onClick.AddListener(() => RestartGame());
         ActivateMainMenu();
         textLaps.text = "Lap 0/5";
     }
-
+    private void RestartGame()
+    {        
+        Destroy(m_NetworkManager.gameObject);
+        SceneManager.LoadScene("Game");
+    }
     private void StartRace()
     {
         buttonReady.GetComponent<Image>().color = Color.green;
