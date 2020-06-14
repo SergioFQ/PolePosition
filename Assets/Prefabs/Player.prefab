@@ -257,6 +257,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  m_PlayerController: {fileID: 0}
+  m_PlayerInfo: {fileID: 0}
 --- !u!114 &3466774584401487325
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1684,7 +1684,6 @@ MonoBehaviour:
   m_Distance: 10
   m_Elevation: 8
   m_Following: 0.5
-  nextPoint: {x: 0, y: 0, z: 0}
 --- !u!1001 &381981127
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8034,6 +8033,7 @@ MonoBehaviour:
   inputFieldName: {fileID: 1834584567}
   colorNumber: 0
   playerName: 
+  ready: 0
   inGameHUD: {fileID: 1585190050}
   textSpeed: {fileID: 1475543394}
   textLaps: {fileID: 155323079}
@@ -8225,7 +8225,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  numPlayers: 0
+  numPlayersReady: 0
   networkManager: {fileID: 0}
   posSphere: []
   checkpoints:
@@ -8242,6 +8242,7 @@ MonoBehaviour:
   - {fileID: 2039146219}
   - {fileID: 1601851780}
   - {fileID: 506467446}
+  m_SetUpPlayer: {fileID: 0}
 --- !u!4 &1839589614
 Transform:
   m_ObjectHideFlags: 0

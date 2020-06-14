@@ -22,5 +22,5 @@ public class PlayerInfo : MonoBehaviour
         return Name;
     }
 
-    public bool isReady { get; set; }
+    public bool IsReady { get; set; }
 }

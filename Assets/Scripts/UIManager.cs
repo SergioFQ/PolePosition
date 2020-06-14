@@ -8,10 +8,9 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
     public bool showGUI = true;
-    private PolePositionManager m_polePositionManager;
+    public PolePositionManager m_polePositionManager;
     private NetworkManager m_NetworkManager;
-    private SetupPlayer m_SetUpPlayer;
-    private PlayerController m_PlayerController;
+    public SetupPlayer m_SetUpPlayer;
 
     [Header("Main Menu")] [SerializeField] private GameObject mainMenu;
     [SerializeField] private Button buttonHost;
@@ -40,9 +39,6 @@ public class UIManager : MonoBehaviour
     private void Awake()
     {
         m_NetworkManager = FindObjectOfType<NetworkManager>();
-        m_polePositionManager = FindObjectOfType<PolePositionManager>();
-        m_SetUpPlayer = FindObjectOfType<SetupPlayer>();
-        m_PlayerController = FindObjectOfType<PlayerController>();
     }
 
     private void Start()
@@ -59,10 +55,8 @@ public class UIManager : MonoBehaviour
     private void StartRace()
     {
         buttonReady.GetComponent<Image>().color = Color.green;
-        //Debug.Log(m_PlayerController.topSpeed);
-        //m_SetUpPlayer.CmdSetReady();
-        m_polePositionManager.StartRaceCall();
-        //m_polePositionManager.numPlayersReady++;
+        buttonReady.onClick.RemoveAllListeners();
+        m_polePositionManager.startRace();
     }
 
     public void UpdateSpeed(int speed)

@@ -13,11 +13,10 @@ public class SetupPlayer : NetworkBehaviour
     [SyncVar] private int m_ID;
     [SyncVar (hook = nameof(setName))] private string m_Name;
     [SyncVar (hook = nameof(setColour))] private int m_Colour;
-    [SyncVar(hook = nameof(SetReady))] private bool m_Ready;
     private UIManager m_UIManager;
     private NetworkManager m_NetworkManager;
-    private PlayerController m_PlayerController;
-    private PlayerInfo m_PlayerInfo;
+    public PlayerController m_PlayerController;
+    public PlayerInfo m_PlayerInfo;
     private PolePositionManager m_PolePositionManager;
     
 
@@ -43,27 +42,18 @@ public class SetupPlayer : NetworkBehaviour
         base.OnStartClient();
         if (isLocalPlayer)
         {
-            m_PlayerInfo.ID = m_ID;
-            //m_Name = (m_UIManager.playerName == "") ? ("Player" + m_ID) : (m_UIManager.playerName);
-            CmdSelectName((m_UIManager.playerName == "") ? ("Player" + m_ID) : (m_UIManager.playerName));
-            //setName("",m_Name);
-            m_PlayerInfo.CurrentLap = 0;
-            //m_PlayerInfo.LastPoint = -1;
-            //m_PlayerInfo.ColourID = m_UIManager.colorNumber;
-            //m_Colour = m_UIManager.colorNumber;
-            CmdSelectColor(m_UIManager.colorNumber);
-            //setColour(0 , m_Colour);
             m_PolePositionManager.m_SetUpPlayer = this;
+            m_PlayerInfo.ID = m_ID;
+            CmdSelectName((m_UIManager.playerName == "") ? ("Player" + m_ID) : (m_UIManager.playerName));
+            m_PlayerInfo.CurrentLap = 0;
+            CmdSelectColor(m_UIManager.colorNumber);
+            m_PlayerInfo.IsReady = false;
         }
+
         m_PlayerInfo.ID = m_ID;
         m_PlayerInfo.LastPoint = -1;
-        m_PlayerInfo.isReady = false;
-        //m_PlayerInfo.CurrentLap = -1;
         m_PolePositionManager.AddPlayer(m_PlayerInfo);
-        /*else
-        {
-            Debug.Log(m_Name + "Name: " +m_PlayerInfo.Name + " Color " + m_PlayerInfo.ColorID + " Pos " + m_PlayerInfo.CurrentPosition);
-        }*/
+        
     }
 
     /// <summary>
@@ -92,7 +82,6 @@ public class SetupPlayer : NetworkBehaviour
         {
             m_PlayerController.enabled = true;
             m_PlayerController.OnSpeedChangeEvent += OnSpeedChangeEventHandler;
-            //ConfigureColor();
             ConfigureCamera();
         }
     }
@@ -102,13 +91,7 @@ public class SetupPlayer : NetworkBehaviour
         m_UIManager.UpdateSpeed((int) speed * 5); // 5 for visualization purpose (km/h)
     }
 
-    /*
-    void OnLapChangeEventHandler(int lap)
-    {
-        m_UIManager.UpdateLap(lap);
-        //m_PlayerInfo.CurrentLap = lap;
-    }
-    */
+    
     void ConfigureCamera()
     {
         if (Camera.main != null) Camera.main.gameObject.GetComponent<CameraController>().m_Focus = this.gameObject;
@@ -118,11 +101,7 @@ public class SetupPlayer : NetworkBehaviour
     {
         m_PlayerInfo.Name = newName;
     }
-
-    void SetReady(bool old, bool newReady)
-    {
-        m_PlayerInfo.isReady = newReady;
-    }
+    
 
 
     void setColour(int old, int newColour)
@@ -149,13 +128,9 @@ public class SetupPlayer : NetworkBehaviour
                 break;
         }
     }
-    [Command]
-    public void CmdStartRace()
-    {
-        Debug.Log( "llamada del cliente");
-        m_PolePositionManager.RpcUpdateNumPlayersReady();
-        //Debug.Log(numPlayersReady);
-    }
+
+    
+
     [Command]
     void CmdSelectName(string name)
     {
@@ -167,28 +142,11 @@ public class SetupPlayer : NetworkBehaviour
         m_Colour = colour;
     }
 
-    /*//dependiendo del id del color seleccionado en botón de color del menú inicial, cambiaremos la skin de nuestro vehiculo
-    void ConfigureColor()
+    [Command]
+    public void CmdAddNumPlayer()
     {
+        m_PolePositionManager.numPlayers += 1;
+    }
 
-        switch (m_PlayerInfo.ColourID)
-        {
-            case 0:
-                transform.Find("raceCar").Find("body_red").gameObject.SetActive(true);
-                break;
-            case 1:
-                transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
-                transform.Find("raceCar").Find("body_green").gameObject.SetActive(true);
-
-                break;
-            case 2:
-                transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
-                transform.Find("raceCar").Find("body_orange").gameObject.SetActive(true);
-                break;
-            case 3:
-                transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
-                transform.Find("raceCar").Find("body_white").gameObject.SetActive(true);
-                break;
-        }
-    }*/
+  
 }

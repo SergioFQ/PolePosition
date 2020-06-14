@@ -7,27 +7,25 @@ using UnityEngine;
 
 public class PolePositionManager : NetworkBehaviour
 {
-    public int numPlayersReady;
+    [SyncVar (hook = nameof(numPlayersHook))] public int numPlayers;
     public NetworkManager networkManager;
     public Vector3[] posSphere; //vector publico que guardaría la posición de las esferas
     private readonly List<PlayerInfo> m_Players = new List<PlayerInfo>(4);
     private List<PlayerInfo> ordenP = new List<PlayerInfo>(4);
     private CircuitController m_CircuitController;
-    private PlayerController m_playerController;
     private GameObject[] m_DebuggingSpheres;
     [SyncVar(hook = nameof(SetRaceOrder))] private string myRaceOrder = "";
     private UIManager m_UIManager;
     private float[] arcLengths;
     public GameObject[] checkpoints;
-    private PlayerInfo m_PlayerInfo; 
+    //private PlayerInfo m_PlayerInfo; 
     public SetupPlayer m_SetUpPlayer;
 
     private void Awake()
     {
         if (networkManager == null) networkManager = FindObjectOfType<NetworkManager>();
         if (m_CircuitController == null) m_CircuitController = FindObjectOfType<CircuitController>();
-        posSphere = new Vector3[4];
-        m_playerController = FindObjectOfType<PlayerController>();
+        posSphere = new Vector3[4];        
         m_DebuggingSpheres = new GameObject[networkManager.maxConnections];
         for (int i = 0; i < networkManager.maxConnections; ++i)
         {
@@ -36,8 +34,9 @@ public class PolePositionManager : NetworkBehaviour
             posSphere[i] = this.m_DebuggingSpheres[i].transform.position; // Se inicializa a la primera posición de la esfera en el circuito y se actualiza más abajo
         }
         m_UIManager = FindObjectOfType<UIManager>();
+        m_UIManager.m_polePositionManager = this; //de esta forma sabemos la relacion de cada poleposition con ui manager de cada player
         //m_SetUpPlayer = FindObjectOfType<SetupPlayer>();
-        m_PlayerInfo = GetComponent<PlayerInfo>();
+        //m_PlayerInfo = GetComponent<PlayerInfo>();
     }
 
     private void Update()
@@ -130,55 +129,28 @@ public class PolePositionManager : NetworkBehaviour
 
         }
     }
-    public void StartRaceCall()
+
+    public void startRace()
     {
         if (isServer)
         {
-            RpcUpdateNumPlayersReady();
+            numPlayers += 1; 
         }
         else
         {
-            m_SetUpPlayer.CmdStartRace();
+            m_SetUpPlayer.CmdAddNumPlayer();
         }
-    }
 
-    [ClientRpc]
-    public void RpcUpdateNumPlayersReady()
-    {
-        numPlayersReady++;
-        StartRace(0,0);
+
     }
     
-
-
-    //Una vez los jugadores seleccionen "Ready" se llamará a este método y empezará la carrera
-    //[ClientRpc]
-    public void StartRace(int old, int newV)
+    private void numPlayersHook(int old, int newValue)
     {
-        /*bool activado = false;
-        foreach (var player in m_Players)
+        if (newValue>=m_Players.Count)
         {
-            if(!player.GetComponent<PlayerInfo>().isReady && !activado)
-            {
-                player.GetComponent<PlayerInfo>().isReady = true;
-            }
-        }
-        
-        int aux = 0;
-        foreach (var player in m_Players)
-        {
-            if (player.GetComponent<UIManager>().ready)
-                aux++;
-        }*/
-        Debug.Log(numPlayersReady);
-        if (numPlayersReady >= m_Players.Count)
-        {
-            //activamos todos los coches
-            foreach (var player in m_Players)
-            {
-                player.GetComponent<PlayerController>().isReady = true;
-                m_UIManager.deactivateReadyMenu();
-            }
+            Debug.Log("Arrancamos");
+            m_SetUpPlayer.m_PlayerController.isReady = true;
+            m_UIManager.deactivateReadyMenu();
         }
     }
 
