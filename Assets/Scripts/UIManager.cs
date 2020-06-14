@@ -87,6 +87,14 @@ public class UIManager : MonoBehaviour
         readyMenu.SetActive(true);
     }
 
+    public void ActivateGameOver()
+    {
+        mainMenu.SetActive(false);
+        inGameHUD.SetActive(false);
+        readyMenu.SetActive(false);
+        Debug.Log("GameOver");
+    }
+
     private void StartHost()
     {
         m_NetworkManager.StartHost();

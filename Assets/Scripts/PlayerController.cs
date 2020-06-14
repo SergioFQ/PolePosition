@@ -28,7 +28,7 @@ public class PlayerController : NetworkBehaviour
     private float InputBrake { get; set; }
 
     private PlayerInfo m_PlayerInfo;
-    private UIManager m_UIManager;
+    public UIManager m_UIManager;
     private WheelFrictionCurve frictionCurve;//creamos la curva de fricción para eliminar la deriva
     private Rigidbody m_Rigidbody;
     private float m_SteerHelper = 0.8f;
@@ -38,6 +38,7 @@ public class PlayerController : NetworkBehaviour
     private CameraController m_cameraController;//usado para controlar cuando el jugador vuelca
     private bool debugUpsideDown = false;
     public bool isReady = false;//variable que se usará para activar todos los coches a la vez
+    public GameObject[] posRanking;
 
     private float Speed
     {
@@ -373,6 +374,25 @@ public class PlayerController : NetworkBehaviour
         {
             m_UIManager.UpdateLap(newLap);
         }
+    }
+
+    public void SetInactive()
+    {
+         WheelFrictionCurve friction = axleInfos[0].leftWheel.forwardFriction;
+        friction.extremumSlip = 100;
+        m_Rigidbody.velocity = Vector3.zero;
+        m_Rigidbody.angularVelocity = Vector3.zero;
+        transform.position = new Vector3(0, 2, -6);
+        foreach (var axleInfo in axleInfos)
+        {
+            axleInfo.leftWheel.motorTorque = 0;
+            axleInfo.rightWheel.motorTorque = 0;
+            axleInfo.leftWheel.brakeTorque = 1e+30f;
+            axleInfo.rightWheel.brakeTorque = 1e+30f;
+            //axleInfo.leftWheel.forwardFriction = friction;
+            //axleInfo.rightWheel.forwardFriction = friction;
+        }
+        isReady = false;
     }
 
     #endregion
