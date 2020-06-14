@@ -18,6 +18,9 @@ public class PolePositionManager : NetworkBehaviour
     private UIManager m_UIManager;
     private float[] arcLengths;
     public GameObject[] checkpoints;
+    public GameObject[] posRanking;
+    [SerializeField] private GameObject target;
+    [SerializeField] private GameObject cameraRankingPos;
     //private PlayerInfo m_PlayerInfo; 
     public SetupPlayer m_SetUpPlayer;
 
@@ -185,6 +188,11 @@ public class PolePositionManager : NetworkBehaviour
     {
         
         m_UIManager.UpdateNames(newOrder);
+    }
+
+    void SetPosInRanking()
+    {
+
     }
 
 }
