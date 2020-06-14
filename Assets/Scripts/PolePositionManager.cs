@@ -18,13 +18,13 @@ public class PolePositionManager : NetworkBehaviour
     private UIManager m_UIManager;
     private float[] arcLengths;
     public GameObject[] checkpoints;
-    //public GameObject[] posRanking;
-    [SerializeField] private GameObject target;
+    public GameObject[] posRanking;
+     public GameObject target;
     [SerializeField] private GameObject cameraRankingPos;
     //private PlayerInfo m_PlayerInfo; 
     public SetupPlayer m_SetUpPlayer;
-
-    public int ordenRanking = 0;
+    [SyncVar(hook = nameof(UpdateNamesRanking))] public string namesRanking = "";
+    [SyncVar(hook = nameof(setOrderRanking))] public int ordenRanking = 0;
 
     private void Awake()
     {
@@ -133,6 +133,7 @@ public class PolePositionManager : NetworkBehaviour
 
 
         }
+        Debug.Log(namesRanking);
     }
 
     public void startRace()
@@ -192,11 +193,41 @@ public class PolePositionManager : NetworkBehaviour
         m_UIManager.UpdateNames(newOrder);
     }
 
-    public Vector3 SetPosInRanking()
+    public void SetNamesRanking()
     {
-        m_SetUpPlayer.m_PlayerController.posRanking = posRanking[ordenRanking].transform.position;
-        ordenRanking++;
-        return target.transform.position;
+        if (isServer)
+        {
+            namesRanking += m_Players[0].Name + "\n";
+            //UpdateNamesRanking("", namesRanking);
+        }
+        else
+        {
+            m_SetUpPlayer.CmdUpdateNamesRanking();
+        }
+    }
+
+    public void SetPosInRanking()
+    {
+        
+        if (isServer)
+        {
+            ordenRanking++;
+        }
+        else
+        {
+            m_SetUpPlayer.CmdUpdateOrdenRanking();
+        }
+        //return target.transform.position;
+    }
+
+    private void setOrderRanking(int old, int newOR)
+    {
+        m_SetUpPlayer.m_PlayerController.posRanking = posRanking[old].transform.position;
+    }
+
+    private void UpdateNamesRanking(string old, string newOR)
+    {
+        m_UIManager.UpdateRanking(newOR);
     }
 
 }

@@ -17,7 +17,7 @@ public class SetupPlayer : NetworkBehaviour
     private NetworkManager m_NetworkManager;
     public PlayerController m_PlayerController;
     public PlayerInfo m_PlayerInfo;
-    private PolePositionManager m_PolePositionManager;
+    public PolePositionManager m_PolePositionManager;
     
 
     #region Start & Stop Callbacks
@@ -97,9 +97,11 @@ public class SetupPlayer : NetworkBehaviour
         if (Camera.main != null) Camera.main.gameObject.GetComponent<CameraController>().m_Focus = this.gameObject;
     }
 
-    public void UnfocusCamera()
+    public void UnfocusCamera(Vector3 cameraPos, Vector3 targetPos)
     {
         Camera.main.gameObject.GetComponent<CameraController>().m_Focus = null;
+        Camera.main.gameObject.transform.position = cameraPos;
+        Camera.main.gameObject.transform.LookAt(targetPos);
     }
     void setName(string old, string newName)
     {
@@ -152,5 +154,14 @@ public class SetupPlayer : NetworkBehaviour
         m_PolePositionManager.numPlayers += 1;
     }
 
-  
+    [Command]
+    public void CmdUpdateOrdenRanking()
+    {
+        m_PolePositionManager.ordenRanking++;
+    }
+    [Command]
+    public void CmdUpdateNamesRanking()
+    {
+        m_PolePositionManager.namesRanking += m_PlayerInfo.Name + "\n";
+    }
 }

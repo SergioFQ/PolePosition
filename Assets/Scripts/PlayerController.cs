@@ -383,8 +383,8 @@ public class PlayerController : NetworkBehaviour
         friction.extremumSlip = 100;
         m_Rigidbody.velocity = Vector3.zero;
         m_Rigidbody.angularVelocity = Vector3.zero;
-        Vector3 target = m_PolePositionManager.SetPosInRanking();
-        transform.LookAt(target);
+        m_PolePositionManager.SetPosInRanking();
+        transform.LookAt(m_PolePositionManager.target.transform.position);
         transform.position = posRanking;
         foreach (var axleInfo in axleInfos)
         {

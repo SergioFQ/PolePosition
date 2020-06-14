@@ -81,6 +81,10 @@ public class UIManager : MonoBehaviour
     {
         textPosition.text = name;
     }
+    public void UpdateRanking(string name)
+    {
+        finalPositions.text =  name;
+    }
 
     private void ActivateMainMenu()
     {
