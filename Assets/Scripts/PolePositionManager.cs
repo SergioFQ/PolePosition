@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using Mirror;
 using UnityEngine;
 
@@ -135,10 +136,23 @@ public class PolePositionManager : NetworkBehaviour
         }
     }
 
+    public void endGame()
+    {
+        if (isServer)
+        {
+            networkManager.StopHost();
+        }
+        else
+        {
+            networkManager.StopClient();//debemos ver como evitar que se rompa el servidor cuando un cliente se va
+        }
+    }
+    
     public void startRace()
     {
         if (isServer)
         {
+            //Interlocked.Increment(ref numPlayers);
             numPlayers += 1; 
         }
         else
@@ -153,7 +167,7 @@ public class PolePositionManager : NetworkBehaviour
     {
         if (newValue>=m_Players.Count)
         {
-            Debug.Log("Arrancamos");
+            //Debug.Log("Arrancamos");
             m_SetUpPlayer.m_PlayerController.isReady = true;
             m_UIManager.deactivateReadyMenu();
         }
@@ -194,6 +208,7 @@ public class PolePositionManager : NetworkBehaviour
 
     public void SetNamesRanking()
     {
+
         if (isServer)
         {
             namesRanking += m_Players[0].Name + "\n";
@@ -210,6 +225,7 @@ public class PolePositionManager : NetworkBehaviour
         
         if (isServer)
         {
+            //Interlocked.Increment(ref ordenRanking);
             ordenRanking++;
         }
         else

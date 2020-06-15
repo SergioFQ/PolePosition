@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Mirror;
 using UnityEngine;
 using Random = System.Random;
@@ -151,12 +152,14 @@ public class SetupPlayer : NetworkBehaviour
     [Command]
     public void CmdAddNumPlayer()
     {
+        //Interlocked.Increment(ref m_PolePositionManager.numPlayers);
         m_PolePositionManager.numPlayers += 1;
     }
 
     [Command]
     public void CmdUpdateOrdenRanking()
     {
+        //Interlocked.Increment(ref m_PolePositionManager.ordenRanking);
         m_PolePositionManager.ordenRanking++;
     }
     [Command]

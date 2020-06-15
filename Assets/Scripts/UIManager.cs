@@ -57,7 +57,8 @@ public class UIManager : MonoBehaviour
         textLaps.text = "Lap 0/5";
     }
     private void RestartGame()
-    {        
+    {
+        m_polePositionManager.endGame();
         Destroy(m_NetworkManager.gameObject);
         SceneManager.LoadScene("Game");
     }
