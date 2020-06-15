@@ -3,6 +3,7 @@ using System.Threading;
 using Mirror;
 using UnityEngine;
 using Random = System.Random;
+using System.Diagnostics;
 
 /*
 	Documentation: https://mirror-networking.com/docs/Guides/NetworkBehaviour.html
@@ -83,6 +84,8 @@ public class SetupPlayer : NetworkBehaviour
         {
             m_PlayerController.enabled = true;
             m_PlayerController.OnSpeedChangeEvent += OnSpeedChangeEventHandler;
+            m_PlayerController.OnTotalTimeChangeEvent += OnTotalChangeEventHandler;
+            m_PlayerController.OnLapTimeChangeEvent += OnLapChangeEventHandler;
             ConfigureCamera();
         }
     }
@@ -92,7 +95,15 @@ public class SetupPlayer : NetworkBehaviour
         m_UIManager.UpdateSpeed((int) speed * 5); // 5 for visualization purpose (km/h)
     }
 
-    
+    void OnTotalChangeEventHandler(Stopwatch tt)
+    {
+        m_UIManager.UpdateTotalTime(m_PlayerController.TimeToString(tt));
+    }
+    void OnLapChangeEventHandler(Stopwatch lt)
+    {
+        m_UIManager.UpdateLapTime(m_PlayerController.TimeToString(lt));
+    }
+
     void ConfigureCamera()
     {
         if (Camera.main != null) Camera.main.gameObject.GetComponent<CameraController>().m_Focus = this.gameObject;

@@ -25,7 +25,7 @@ public class PolePositionManager : NetworkBehaviour
     //private PlayerInfo m_PlayerInfo; 
     public SetupPlayer m_SetUpPlayer;
     [SyncVar(hook = nameof(UpdateNamesRanking))] public string namesRanking = "";
-    [SyncVar(hook = nameof(setOrderRanking))] public int ordenRanking = 0;
+    [SyncVar(hook = nameof(SetOrderRanking))] public int ordenRanking = 0;
 
     private void Awake()
     {
@@ -170,6 +170,7 @@ public class PolePositionManager : NetworkBehaviour
             //Debug.Log("Arrancamos");
             m_SetUpPlayer.m_PlayerController.isReady = true;
             m_UIManager.deactivateReadyMenu();
+            m_SetUpPlayer.m_PlayerController.StartTime();
         }
     }
 
@@ -208,10 +209,10 @@ public class PolePositionManager : NetworkBehaviour
 
     public void SetNamesRanking()
     {
-
+        
         if (isServer)
         {
-            namesRanking += m_Players[0].Name + "\n";
+            namesRanking += m_SetUpPlayer.m_PlayerInfo.Name + "\n";
             //UpdateNamesRanking("", namesRanking);
         }
         else
@@ -236,7 +237,7 @@ public class PolePositionManager : NetworkBehaviour
         //return target.transform.position;
     }
 
-    private void setOrderRanking(int old, int newOR)
+    private void SetOrderRanking(int old, int newOR)
     {
         m_SetUpPlayer.m_PlayerController.posRanking = posRanking[old].transform.position;
     }

@@ -26,16 +26,17 @@ public class LapManager : MonoBehaviour
         {
             Debug.Log("Bien");
             other.GetComponent<PlayerInfo>().LastPoint = - 1;
-            other.GetComponent<PlayerController>().m_CurrentLap++;
-            if (other.GetComponent<PlayerController>().m_CurrentLap == 1)
+            if (other.GetComponent<PlayerInfo>().CurrentLap == 1)
             {
                 other.GetComponent<SetupPlayer>().UnfocusCamera(posCamera.transform.position, targetCamera.transform.position);
                 other.GetComponent<PlayerController>().m_UIManager.ActivateGameOver();
-                other.GetComponent<SetupPlayer>().m_PolePositionManager.SetNamesRanking();
+                if (other.GetComponent<PlayerController>().isReady)
+                    other.GetComponent<SetupPlayer>().m_PolePositionManager.SetNamesRanking();
                 other.GetComponent<PlayerController>().SetInactive();
 
             }
 
+            other.GetComponent<PlayerController>().IncreaseLap();
             //m_UIManager.UpdateLap(other.GetComponent<PlayerController>().m_CurrentLap);
         }
         /*else

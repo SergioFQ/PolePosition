@@ -31,6 +31,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Text textLaps;
     [SerializeField] private Text textPosition;
     [SerializeField] private Text textColor;
+    [SerializeField] private Text textLapTime;
+    [SerializeField] private Text textTotalTime;
     [SerializeField] public RawImage wrongWay;
 
     [Header("Ready Menu")] [SerializeField] private GameObject readyMenu; //facilitamos la visualización del inspector poniendo este header
@@ -38,6 +40,8 @@ public class UIManager : MonoBehaviour
 
     [Header("Game Over Menu")] [SerializeField] private GameObject gameOverMenu;
     [SerializeField] private Text finalPositions;
+    [SerializeField] private Text finalTotalTime;
+    [SerializeField] private Text finalBestLap;
     [SerializeField] private Button buttonRestart;
     
     private void Awake()
@@ -85,6 +89,23 @@ public class UIManager : MonoBehaviour
     public void UpdateRanking(string name)
     {
         finalPositions.text =  name;
+    }
+    public void UpdateLapTimeRanking(string name)
+    {
+        finalBestLap.text += name + "\n";
+    }
+    public void UpdateTotalTimeRanking(string name)
+    {
+        finalTotalTime.text += name + "\n";
+    }
+
+    public void UpdateTotalTime(string name)
+    {
+        textTotalTime.text = "Total time: " + name;
+    }
+    public void UpdateLapTime(string name)
+    {
+        textLapTime.text = "Current lap: " + name;
     }
 
     private void ActivateMainMenu()

@@ -23,4 +23,8 @@ public class PlayerInfo : MonoBehaviour
     }
 
     public bool IsReady { get; set; }
+
+    public string FinalTime { get; set; }
+
+    public string BestLapTime { get; set; }
 }
