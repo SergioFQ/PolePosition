@@ -42,17 +42,16 @@ public class SetupPlayer : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
-        if (isLocalPlayer)
+        /*if (isLocalPlayer)
         {
             m_PolePositionManager.m_SetUpPlayer = this;
-            m_PlayerInfo.ID = m_ID;
+            //m_PlayerInfo.ID = m_ID;
             CmdSelectName((m_UIManager.playerName == "") ? ("Player" + m_ID) : (m_UIManager.playerName));
             m_PlayerInfo.CurrentLap = 0;
             CmdSelectColor(m_UIManager.colorNumber);
             m_PlayerInfo.IsReady = false;
-        }
-
-        m_PlayerInfo.ID = m_ID;
+        }*/
+        m_PlayerInfo.ID = m_PolePositionManager.m_Players.Count;
         m_PlayerInfo.LastPoint = -1;
         m_PolePositionManager.AddPlayer(m_PlayerInfo);
         
@@ -64,6 +63,12 @@ public class SetupPlayer : NetworkBehaviour
     /// </summary>
     public override void OnStartLocalPlayer()
     {
+        m_PolePositionManager.m_SetUpPlayer = this;
+        //m_PlayerInfo.ID = m_ID;
+        CmdSelectName((m_UIManager.playerName == "") ? ("Player" + m_ID) : (m_UIManager.playerName));
+        m_PlayerInfo.CurrentLap = 0;
+        CmdSelectColor(m_UIManager.colorNumber);
+        m_PlayerInfo.IsReady = false;
     }
 
     #endregion
@@ -148,7 +153,6 @@ public class SetupPlayer : NetworkBehaviour
     }
 
     
-
     [Command]
     void CmdSelectName(string name)
     {

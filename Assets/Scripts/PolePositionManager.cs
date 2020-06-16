@@ -106,15 +106,6 @@ public class PolePositionManager : NetworkBehaviour
                 ordenP.Add(m_Players[i]);
             }
 
-            /*foreach (var _player in m_Players)
-            {
-                if (_player == null)
-                {
-                    RemovePlayer();
-                }
-                ComputeCarArcLength(_player.ID);
-
-            }*/
             for (int i = m_Players.Count - 1 ; i >= 0 ; i--)
             {
                 if (m_Players[i] == null)
@@ -127,6 +118,8 @@ public class PolePositionManager : NetworkBehaviour
                 }
             }
 
+
+
             for (int i = 0; i < arcLengths.Length; i++)
             {
                 orden[i] = arcLengths[i];
@@ -137,7 +130,7 @@ public class PolePositionManager : NetworkBehaviour
             myRaceOrder = " ";
             foreach (var _player in ordenP)
             {
-                myRaceOrder += _player.Name + /*" " + arcLengths[_player.ID] +*/ "\n";
+                myRaceOrder += _player.Name + "\n";
 
             }
         }
@@ -151,9 +144,7 @@ public class PolePositionManager : NetworkBehaviour
         }
         else
         {
-            //m_SetUpPlayer.CmdRemovePlayer(m_SetUpPlayer.m_PlayerInfo.ID);
-            //m_Players.RemoveAt(m_SetUpPlayer.m_PlayerInfo.ID);
-            networkManager.StopClient();//debemos ver como evitar que se rompa el servidor cuando un cliente se va
+            networkManager.StopClient();
         }
     }
     
@@ -174,21 +165,11 @@ public class PolePositionManager : NetworkBehaviour
     
     public void RemovePlayer(int id)
     {
-        Debug.Log("Empezamos remove " + m_Players.Count);
-        //m_Players[id] = null;
         for (int i = id + 1; i < m_Players.Count; i++)
         {
-            //if (id + 1 < m_Players.Count - 1)
-            //{
-                
-                m_Players[i].ID--;
-            //}
-
+            m_Players[i].ID--;
         }
         m_Players.RemoveAt(id);
-
-        Debug.Log("Acabamos el remove " + m_Players.Count);
-
     }
 
     private void numPlayersHook(int old, int newValue)
@@ -207,8 +188,8 @@ public class PolePositionManager : NetworkBehaviour
         // Compute the projection of the car position to the closest circuit 
         // path segment and accumulate the arc-length along of the car along
         // the circuit.
-        Debug.Log("ID: "+ID+"Size: "+m_Players.Count);
-        Debug.Log("ID DEL PAVO " +m_Players[ID].ID);
+        //Debug.Log("ID: "+ID+"Size: "+m_Players.Count);
+        //Debug.Log("ID DEL PAVO " +m_Players[ID].ID);
         Vector3 carPos = this.m_Players[ID].transform.position;
         int segIdx;
         float carDist;

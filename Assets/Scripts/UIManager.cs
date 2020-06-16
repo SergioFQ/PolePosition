@@ -63,7 +63,7 @@ public class UIManager : MonoBehaviour
         buttonRestart.onClick.AddListener(() => RestartGame());
         buttonInGameMainMenu.onClick.AddListener(() => RestartGame());
         buttonQuitGame.onClick.AddListener(() => ExitGame());
-        buttonMainMenuQuit.onClick.AddListener(() => ExitGame());
+        buttonMainMenuQuit.onClick.AddListener(() => ExitGameMainMenu());
         ActivateMainMenu();
         textLaps.text = "Lap 0/5";
     }
@@ -72,6 +72,11 @@ public class UIManager : MonoBehaviour
     {
         m_polePositionManager.EndGame();
         Destroy(m_NetworkManager.gameObject);
+        Application.Quit();
+    }
+
+    private void ExitGameMainMenu()
+    {
         Application.Quit();
     }
 

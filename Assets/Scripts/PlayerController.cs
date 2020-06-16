@@ -239,7 +239,6 @@ public class PlayerController : NetworkBehaviour
         }
         else
         {
-
             posAux = m_PolePositionManager.checkpoints[m_PlayerInfo.LastPoint].transform.position;
         }
         m_Rigidbody.velocity = Vector3.zero;
