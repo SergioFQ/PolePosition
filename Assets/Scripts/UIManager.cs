@@ -20,11 +20,13 @@ public class UIManager : MonoBehaviour
     [SerializeField] private InputField inputFieldIP;
     [SerializeField] private Button buttonColor;
     [SerializeField] private InputField inputFieldName;
+    [SerializeField] private Button buttonMainMenuQuit;
     public int colorNumber = 0;
     public string playerName = "";
     public bool ready = false;
 
-    [Header("In-Game HUD")] [SerializeField]
+    [Header("In-Game HUD")]
+    [SerializeField]
     private GameObject inGameHUD;
 
     [SerializeField] private Text textSpeed;
@@ -34,6 +36,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Text textLapTime;
     [SerializeField] private Text textTotalTime;
     [SerializeField] private RawImage wrongWay;
+    [SerializeField] private Button buttonQuitGame;
+    [SerializeField] private Button buttonInGameMainMenu;
 
     [Header("Ready Menu")] [SerializeField] private GameObject readyMenu; //facilitamos la visualización del inspector poniendo este header
     [SerializeField] private Button buttonReady;
@@ -43,7 +47,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Text finalTotalTime;
     [SerializeField] private Text finalBestLap;
     [SerializeField] private Button buttonRestart;
-    
+
     private void Awake()
     {
         m_NetworkManager = FindObjectOfType<NetworkManager>();
@@ -57,9 +61,20 @@ public class UIManager : MonoBehaviour
         buttonColor.onClick.AddListener(() => SelectColor());
         buttonReady.onClick.AddListener(() => StartRace());
         buttonRestart.onClick.AddListener(() => RestartGame());
+        buttonInGameMainMenu.onClick.AddListener(() => RestartGame());
+        buttonQuitGame.onClick.AddListener(() => ExitGame());
+        buttonMainMenuQuit.onClick.AddListener(() => ExitGame());
         ActivateMainMenu();
         textLaps.text = "Lap 0/5";
     }
+
+    private void ExitGame()
+    {
+        m_polePositionManager.endGame();
+        Destroy(m_NetworkManager.gameObject);
+        Application.Quit();
+    }
+
     private void RestartGame()
     {
         m_polePositionManager.endGame();
@@ -88,7 +103,7 @@ public class UIManager : MonoBehaviour
     }
     public void UpdateRanking(string name)
     {
-        finalPositions.text =  name;
+        finalPositions.text = name;
     }
     public void UpdateLapTimeRanking(string name)
     {
@@ -160,7 +175,7 @@ public class UIManager : MonoBehaviour
     {
         readyMenu.SetActive(false);
     }
-
+    
     //cambiamos el color del coche dando click al botón de color las veces que sean necesarias hasta ver que aparece el texto del color deseado. Los colores son (ROJO, VERDE, AMARILLO Y BLANCO)
     private void SelectColor()
     {
