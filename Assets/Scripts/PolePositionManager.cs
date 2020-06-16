@@ -11,7 +11,7 @@ public class PolePositionManager : NetworkBehaviour
     [SyncVar (hook = nameof(numPlayersHook))] public int numPlayers;
     public NetworkManager networkManager;
     public Vector3[] posSphere; //vector publico que guardaría la posición de las esferas
-    private readonly List<PlayerInfo> m_Players = new List<PlayerInfo>(4);
+    public readonly List<PlayerInfo> m_Players = new List<PlayerInfo>(4);
     private List<PlayerInfo> ordenP = new List<PlayerInfo>(4);
     private CircuitController m_CircuitController;
     private GameObject[] m_DebuggingSpheres;
@@ -70,7 +70,12 @@ public class PolePositionManager : NetworkBehaviour
 
         public override int Compare(PlayerInfo x, PlayerInfo y)
         {
-            if (m_ArcLengths[x.ID] > m_ArcLengths[y.ID] || x.CurrentLap > y.CurrentLap)
+            if (x.CurrentLap < y.CurrentLap)
+            {
+                return 1;
+            }
+
+            if (m_ArcLengths[x.ID] > m_ArcLengths[y.ID] )
             {
                 if (x.CurrentLap == y.CurrentLap && (x.LastPoint == -1 && y.LastPoint != -1))
                 {
@@ -109,10 +114,9 @@ public class PolePositionManager : NetworkBehaviour
 
             for (int i = 0; i < arcLengths.Length; i++)
             {
-                //Debug.Log("arclegths " + i + " ID " +m_Players[i].ID + "  Nombre "+ m_Players[i].Name + " "+ arcLengths[i]);
                 orden[i] = arcLengths[i];
             }
-
+            
             ordenP.Sort(new PlayerInfoComparer(orden));
 
             myRaceOrder = " ";
@@ -121,18 +125,6 @@ public class PolePositionManager : NetworkBehaviour
                 myRaceOrder += _player.Name + /*" " + arcLengths[_player.ID] +*/ "\n";
 
             }
-            for (int i = 0; i < m_Players.Count; i++)
-            {
-                //Debug.Log("I" + i + " ID " + m_Players[i].ID + "  Nombre " + m_Players[i].Name);
-            }
-
-            for (int i = 0; i < arcLengths.Length; i++)
-            {
-                //Debug.Log("arclegths " + i + " ID " + m_Players[i].ID + "  Nombre " + m_Players[i].Name + " " + arcLengths[i] + " Vuelta: " + m_Players[i].CurrentLap);
-            }
-            SetRaceOrder("", myRaceOrder);
-
-
         }
     }
 
@@ -167,7 +159,6 @@ public class PolePositionManager : NetworkBehaviour
     {
         if (newValue>=m_Players.Count)
         {
-            //Debug.Log("Arrancamos");
             m_SetUpPlayer.m_PlayerController.isReady = true;
             m_UIManager.deactivateReadyMenu();
             m_SetUpPlayer.m_PlayerController.StartTime();
@@ -189,7 +180,7 @@ public class PolePositionManager : NetworkBehaviour
             this.m_CircuitController.ComputeClosestPointArcLength(carPos, out segIdx, out carProj, out carDist);
 
         this.m_DebuggingSpheres[ID].transform.position = carProj;
-        posSphere[ID] = this.m_DebuggingSpheres[ID].transform.position; //actualización de la posición de la esfera por ID, esto sí funciona
+        posSphere[ID] = this.m_DebuggingSpheres[ID].transform.position; 
         if (this.m_Players[ID].CurrentLap == 0)
         {
             minArcL -= m_CircuitController.CircuitLength;
@@ -213,7 +204,6 @@ public class PolePositionManager : NetworkBehaviour
         if (isServer)
         {
             namesRanking += m_SetUpPlayer.m_PlayerInfo.Name + "\n";
-            //UpdateNamesRanking("", namesRanking);
         }
         else
         {
@@ -234,7 +224,6 @@ public class PolePositionManager : NetworkBehaviour
             m_SetUpPlayer.m_PlayerController.posRanking = posRanking[ordenRanking].transform.position;
             m_SetUpPlayer.CmdUpdateOrdenRanking();
         }
-        //return target.transform.position;
     }
 
     private void SetOrderRanking(int old, int newOR)

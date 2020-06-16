@@ -22,23 +22,26 @@ public class LapManager : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.GetComponent<PlayerInfo>().LastPoint == 12)
+        if (other.GetComponent<PlayerController>().isLocalPlayer)
         {
-            Debug.Log("Bien");
-            other.GetComponent<PlayerInfo>().LastPoint = - 1;
-            if (other.GetComponent<PlayerInfo>().CurrentLap == 1)
+            if (other.GetComponent<PlayerInfo>().LastPoint == 12)
             {
-                other.GetComponent<SetupPlayer>().UnfocusCamera(posCamera.transform.position, targetCamera.transform.position);
-                other.GetComponent<PlayerController>().m_UIManager.ActivateGameOver();
-                if (other.GetComponent<PlayerController>().isReady)
-                    other.GetComponent<SetupPlayer>().m_PolePositionManager.SetNamesRanking();
-                other.GetComponent<PlayerController>().SetInactive();
+                Debug.Log("Bien");
+                other.GetComponent<PlayerInfo>().LastPoint = -1;
+                if (other.GetComponent<PlayerInfo>().CurrentLap == 1)
+                {
+                    other.GetComponent<SetupPlayer>().UnfocusCamera(posCamera.transform.position, targetCamera.transform.position);
+                    other.GetComponent<PlayerController>().m_UIManager.ActivateGameOver();
+                    if (other.GetComponent<PlayerController>().isReady)
+                        other.GetComponent<SetupPlayer>().m_PolePositionManager.SetNamesRanking();
+                    other.GetComponent<PlayerController>().SetInactive();
 
+                }
+                other.GetComponent<PlayerController>().IncreaseLap();
+                //m_UIManager.UpdateLap(other.GetComponent<PlayerController>().m_CurrentLap);
             }
-
-            other.GetComponent<PlayerController>().IncreaseLap();
-            //m_UIManager.UpdateLap(other.GetComponent<PlayerController>().m_CurrentLap);
         }
+        
         /*else
         {
             Debug.Log("Tramposo");

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Mirror;
+using System;
 using System.Collections.Generic;
-using UnityEngine;
-using Mirror;
 using System.Diagnostics;
+using UnityEngine;
 /*
 	Documentation: https://mirror-networking.com/docs/Guides/NetworkBehaviour.html
 	API Reference: https://mirror-networking.com/docs/api/Mirror.NetworkBehaviour.html
@@ -105,13 +105,14 @@ public class PlayerController : NetworkBehaviour
         m_cameraController = FindObjectOfType<CameraController>();
         m_Rigidbody = GetComponent<Rigidbody>();
         m_PlayerInfo = GetComponent<PlayerInfo>();
-        m_CurrentLap = m_PlayerInfo.CurrentLap;
+        m_CurrentLap = 0;
         frictionCurve = axleInfos[0].leftWheel.sidewaysFriction;
         frictionCurve.extremumSlip = 0.2f;
         for (int i = 0; i < 2; i++)
             LapTime[i] = new Stopwatch();
         //pos = transform.position;
     }
+
 
     public void Update()
     {
@@ -120,15 +121,15 @@ public class PlayerController : NetworkBehaviour
         InputBrake = Input.GetAxis("Jump");
         Speed = m_Rigidbody.velocity.magnitude;
         TotalTimeDel = totalTime;
-        if(m_CurrentLap < LapTime.Length)
+        if (m_CurrentLap < LapTime.Length)
         {
             LapTimeDel = LapTime[m_CurrentLap];
         }
-        
+
         //Debug volcar y spawnear cuando salimos de la pista
         if (Input.GetKeyUp(KeyCode.F))
         {
-            debugUpsideDown = true; 
+            debugUpsideDown = true;
         }
     }
 
@@ -140,7 +141,7 @@ public class PlayerController : NetworkBehaviour
         float steering = maxSteeringAngle * InputSteering;
         foreach (AxleInfo axleInfo in axleInfos)
         {
-            
+
             if (axleInfo.steering)
             {
                 axleInfo.leftWheel.steerAngle = steering;
@@ -171,7 +172,7 @@ public class PlayerController : NetworkBehaviour
                     axleInfo.leftWheel.motorTorque = 0;
                     axleInfo.leftWheel.brakeTorque = engineBrake;
                     axleInfo.rightWheel.motorTorque = 0;
-                    axleInfo.rightWheel.brakeTorque = engineBrake; 
+                    axleInfo.rightWheel.brakeTorque = engineBrake;
                 }
 
                 if (InputBrake > 0)
@@ -189,21 +190,19 @@ public class PlayerController : NetworkBehaviour
                     frictionCurve.extremumSlip = 0.2f;
                 }
 
-                
-                
+
+
             }
             //asignamos el valor de la fricción lateral
             axleInfo.leftWheel.sidewaysFriction = frictionCurve;
             axleInfo.rightWheel.sidewaysFriction = frictionCurve;
 
-            
+
 
             ApplyLocalPositionToVisuals(axleInfo.leftWheel);//las ruedas estan al reves nombradas (es como si se viesen de frente y no de espaldas)
             ApplyLocalPositionToVisuals(axleInfo.rightWheel);
         }
 
-        //Debug.Log("Vuelta " +m_PlayerInfo.CurrentLap);
-        //Debug.Log(m_PlayerInfo.LastPoint);
         SavingPosition();
         SteerHelper();
         SpeedLimiter();
@@ -213,7 +212,7 @@ public class PlayerController : NetworkBehaviour
 
     #endregion
 
-     #region Methods
+    #region Methods
 
     private void SavingPosition()
     {
@@ -222,7 +221,7 @@ public class PlayerController : NetworkBehaviour
             transform.Rotate(0, 0, 90);
             debugUpsideDown = false;
         }
-        
+
 
         //si esta volcado
         if (Vector3.Dot(transform.up, Vector3.down) > 0 && isReady)
@@ -230,9 +229,9 @@ public class PlayerController : NetworkBehaviour
             CrashSpawn();
         }
     }
-     private void CrashSpawn()
+    private void CrashSpawn()
     {
-        m_UIManager.wrongWay.gameObject.SetActive(false);
+        m_UIManager.SetWrongWay(false);
         Vector3 posAux;
         if (m_PlayerInfo.LastPoint == -1)
         {
@@ -245,42 +244,41 @@ public class PlayerController : NetworkBehaviour
         }
         m_Rigidbody.velocity = Vector3.zero;
         m_Rigidbody.angularVelocity = Vector3.zero;
-        transform.position = new Vector3(posAux.x,posAux.y + 3, posAux.z);       
+        transform.position = new Vector3(posAux.x, posAux.y + 3, posAux.z);
         transform.LookAt(m_PolePositionManager.checkpoints[(m_PlayerInfo.LastPoint + 1) % m_PolePositionManager.checkpoints.Length].transform.position);
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        
+
         if (collision.transform.tag == "OutRace")
         {
-            //contador para que si a los 2 segundos o asi sigues golpeando que llame a la funcion
-                CrashSpawn();
-            
+            CrashSpawn();
         }
-
-        
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.transform.tag == "Checkpoint")
         {
-            //Debug.Log("hola");
             int id = other.GetComponent<CheckpointsBehaviour>().ID;
-            if ((id == m_PlayerInfo.LastPoint + 1) || (id == 0 && m_PlayerInfo.LastPoint==12))
+            if ((id == m_PlayerInfo.LastPoint + 1) || (id == 0 && m_PlayerInfo.LastPoint == 12))
             {
                 m_PlayerInfo.LastPoint = id;
                 //pos = other.transform.position;
             }
             if (id <= m_PlayerInfo.LastPoint - 1)
             {
-                //Debug.Log(m_PlayerInfo.LastPoint + " " + id);
-                m_UIManager.wrongWay.gameObject.SetActive(true);
+                if (isLocalPlayer)
+                    m_UIManager.SetWrongWay(true);
+            }
+            else
+            {
+                if (isLocalPlayer)
+                    m_UIManager.SetWrongWay(false);
             }
             if (id <= m_PlayerInfo.LastPoint - 3 || (m_PlayerInfo.LastPoint <= 3 && id >= 8)) //comprobamos el hacer mal el recorrido
             {
-                //Debug.Log("Habria que hacer Spawn");
                 CrashSpawn();
             }
         }
@@ -308,11 +306,11 @@ public class PlayerController : NetworkBehaviour
                 var howMuchSlip = (wheelHitRight.forwardSlip - slipLimit) / (1 - slipLimit);
                 axleInfo.rightWheel.motorTorque -= axleInfo.rightWheel.motorTorque * howMuchSlip * slipLimit;
             }
-           
+
         }
     }
 
-// this is used to add more grip in relation to speed
+    // this is used to add more grip in relation to speed
     private void AddDownForce()
     {
         foreach (var axleInfo in axleInfos)
@@ -329,8 +327,8 @@ public class PlayerController : NetworkBehaviour
             m_Rigidbody.velocity = topSpeed * m_Rigidbody.velocity.normalized;
     }
 
-// finds the corresponding visual wheel
-// correctly applies the transform
+    // finds the corresponding visual wheel
+    // correctly applies the transform
     public void ApplyLocalPositionToVisuals(WheelCollider col)
     {
         if (col.transform.childCount == 0)
@@ -361,7 +359,7 @@ public class PlayerController : NetworkBehaviour
             }
         }
 
-// this if is needed to avoid gimbal lock problems that will make the car suddenly shift direction
+        // this if is needed to avoid gimbal lock problems that will make the car suddenly shift direction
         if (Mathf.Abs(CurrentRotation - transform.eulerAngles.y) < 10f)
         {
             var turnAdjust = (transform.eulerAngles.y - CurrentRotation) * m_SteerHelper;
@@ -371,7 +369,7 @@ public class PlayerController : NetworkBehaviour
 
         CurrentRotation = transform.eulerAngles.y;
     }
-    
+
     private void SetLap(int old, int newLap)
     {
         if (newLap > 0)
@@ -383,25 +381,30 @@ public class PlayerController : NetworkBehaviour
             LapTime[newLap] = new Stopwatch();
             LapTime[newLap].Start();
         }
-        
+
         if (isLocalPlayer)
         {
             m_PlayerInfo.CurrentLap = newLap;
             m_UIManager.UpdateLap(m_PlayerInfo.CurrentLap);
         }
-        
     }
 
     public void SetInactive()
     {
-        //LapTime[m_CurrentLap].Stop();
         totalTime.Stop();
-        //print(finalTotalTime);
-        //finalTotalTime += timeToString(totalTime) + "F\n";
-        //print(finalTotalTime);
         if (isLocalPlayer)
         {
-            CmdUpdateTime();
+            Stopwatch aux = LapTime[0];
+            foreach (var lap in LapTime)
+            {
+                if (lap.Elapsed.TotalMilliseconds < aux.Elapsed.TotalMilliseconds)
+                {
+                    aux = lap;
+                }
+            }
+            m_PlayerInfo.FinalTime = (TimeToString(totalTime));
+            m_PlayerInfo.BestLapTime = (TimeToString(aux));
+            CmdUpdateTime(m_PlayerInfo.FinalTime, m_PlayerInfo.BestLapTime);
         }
         //print(finalTotalTime);
         WheelFrictionCurve friction = axleInfos[0].leftWheel.forwardFriction;
@@ -424,26 +427,19 @@ public class PlayerController : NetworkBehaviour
     }
 
     [Command]
-    private void CmdUpdateTime()
+    private void CmdUpdateTime(string time, string bestlapTime)
     {
-        finalTotalTime = TimeToString(totalTime);
-        Stopwatch aux = LapTime[0];
-        foreach (var lap in LapTime)
-        {
-            if(lap.Elapsed.TotalMilliseconds < aux.Elapsed.TotalMilliseconds)
-            {
-                aux = lap;
-            }
-        }
-        bestLapTime = TimeToString(aux);
+
+        finalTotalTime = time;
+        bestLapTime = bestlapTime;
     }
 
     [Command]
     private void CmdIncreaseLap()
     {
         m_CurrentLap++;
+        m_PolePositionManager.m_Players[1].CurrentLap = m_CurrentLap;
     }
-
 
     public void StartTime()
     {
@@ -473,8 +469,7 @@ public class PlayerController : NetworkBehaviour
 
     private void FinalTotalTimeToString(string old, string newTime)
     {
-        m_PlayerInfo.FinalTime = newTime;
-        m_UIManager.UpdateTotalTimeRanking(m_PlayerInfo.FinalTime);
+        m_UIManager.UpdateTotalTimeRanking(newTime);
     }
 
     public void IncreaseLap()

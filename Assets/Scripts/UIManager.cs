@@ -33,7 +33,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Text textColor;
     [SerializeField] private Text textLapTime;
     [SerializeField] private Text textTotalTime;
-    [SerializeField] public RawImage wrongWay;
+    [SerializeField] private RawImage wrongWay;
 
     [Header("Ready Menu")] [SerializeField] private GameObject readyMenu; //facilitamos la visualización del inspector poniendo este header
     [SerializeField] private Button buttonReady;
@@ -106,6 +106,10 @@ public class UIManager : MonoBehaviour
     public void UpdateLapTime(string name)
     {
         textLapTime.text = "Current lap: " + name;
+    }
+    public void SetWrongWay (bool state)
+    {
+        wrongWay.gameObject.SetActive(state);
     }
 
     private void ActivateMainMenu()
