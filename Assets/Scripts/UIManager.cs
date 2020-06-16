@@ -70,14 +70,14 @@ public class UIManager : MonoBehaviour
 
     private void ExitGame()
     {
-        m_polePositionManager.endGame();
+        m_polePositionManager.EndGame();
         Destroy(m_NetworkManager.gameObject);
         Application.Quit();
     }
 
     private void RestartGame()
     {
-        m_polePositionManager.endGame();
+        m_polePositionManager.EndGame();
         Destroy(m_NetworkManager.gameObject);
         SceneManager.LoadScene("Game");
     }

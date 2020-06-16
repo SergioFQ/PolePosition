@@ -37,7 +37,7 @@ public class LapManager : MonoBehaviour
                     other.GetComponent<PlayerController>().SetInactive();
 
                 }
-                other.GetComponent<PlayerController>().IncreaseLap();
+                other.GetComponent<PlayerController>().IncreaseLap(other.GetComponent<PlayerInfo>().ID);
                 //m_UIManager.UpdateLap(other.GetComponent<PlayerController>().m_CurrentLap);
             }
         }

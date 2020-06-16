@@ -178,4 +178,10 @@ public class SetupPlayer : NetworkBehaviour
     {
         m_PolePositionManager.namesRanking += m_PlayerInfo.Name + "\n";
     }
+
+    [Command]
+    public void CmdRemovePlayer(int id)
+    {      
+       m_PolePositionManager.RemovePlayer(id);  
+    }
 }

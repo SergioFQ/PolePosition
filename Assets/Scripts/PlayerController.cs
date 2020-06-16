@@ -435,10 +435,10 @@ public class PlayerController : NetworkBehaviour
     }
 
     [Command]
-    private void CmdIncreaseLap()
+    private void CmdIncreaseLap(int id)
     {
         m_CurrentLap++;
-        m_PolePositionManager.m_Players[1].CurrentLap = m_CurrentLap;
+        m_PolePositionManager.m_Players[id].CurrentLap = m_CurrentLap;
     }
 
     public void StartTime()
@@ -472,11 +472,11 @@ public class PlayerController : NetworkBehaviour
         m_UIManager.UpdateTotalTimeRanking(newTime);
     }
 
-    public void IncreaseLap()
+    public void IncreaseLap(int id)
     {
         if (isLocalPlayer)
         {
-            CmdIncreaseLap();
+            CmdIncreaseLap(id);
         }
     }
     #endregion
