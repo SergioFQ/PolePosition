@@ -24,6 +24,12 @@ public class LapManager : MonoBehaviour
     {
         if (other.GetComponent<PlayerController>().isLocalPlayer)
         {
+            if(other.GetComponent<PlayerController>().m_CurrentLap == -1)
+            {
+                other.GetComponent<PlayerInfo>().LastPoint = -1;
+                other.GetComponent<PlayerController>().IncreaseLap(other.GetComponent<PlayerInfo>().ID);
+            }
+
             if (other.GetComponent<PlayerInfo>().LastPoint == 12)
             {
                 Debug.Log("Bien");

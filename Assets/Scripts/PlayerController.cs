@@ -79,19 +79,24 @@ public class PlayerController : NetworkBehaviour
 
     private Stopwatch LapTimeDel
     {
-        get { return totalTime; }
+        get { return LapTime[m_CurrentLap]; }
         set
         {
             if (Math.Abs(totalTime.Elapsed.TotalMilliseconds - value.Elapsed.TotalMilliseconds) < 0.0001f) return;
-            LapTime[m_CurrentLap] = value;
+            if(m_CurrentLap == -1) LapTime[0] = value;
+            else { LapTime[m_CurrentLap] = value; }
             if (OnLapTimeChangeEvent != null)
-                OnLapTimeChangeEvent(LapTime[m_CurrentLap]);
+            {
+                if (m_CurrentLap == -1)
+                    OnLapTimeChangeEvent(LapTime[0]);
+                else { OnLapTimeChangeEvent(LapTime[m_CurrentLap]); }
+            }
         }
     }
 
     public delegate void OnLapTimeChangeDelegate(Stopwatch newVal);
 
-    public event OnTotalTimeChangeDelegate OnLapTimeChangeEvent;
+    public event OnLapTimeChangeDelegate OnLapTimeChangeEvent;
 
 
     #endregion Variables
@@ -105,7 +110,7 @@ public class PlayerController : NetworkBehaviour
         m_cameraController = FindObjectOfType<CameraController>();
         m_Rigidbody = GetComponent<Rigidbody>();
         m_PlayerInfo = GetComponent<PlayerInfo>();
-        m_CurrentLap = 0;
+        m_CurrentLap = -1;
         frictionCurve = axleInfos[0].leftWheel.sidewaysFriction;
         frictionCurve.extremumSlip = 0.2f;
         for (int i = 0; i < 2; i++)
@@ -121,9 +126,13 @@ public class PlayerController : NetworkBehaviour
         InputBrake = Input.GetAxis("Jump");
         Speed = m_Rigidbody.velocity.magnitude;
         TotalTimeDel = totalTime;
-        if (m_CurrentLap < LapTime.Length)
+        if (m_CurrentLap < LapTime.Length && m_CurrentLap!=-1)
         {
             LapTimeDel = LapTime[m_CurrentLap];
+        }
+        if(m_CurrentLap == -1)
+        {
+            LapTimeDel = LapTime[0];
         }
 
         //Debug volcar y spawnear cuando salimos de la pista
@@ -371,6 +380,7 @@ public class PlayerController : NetworkBehaviour
 
     private void SetLap(int old, int newLap)
     {
+        if (newLap == 0) { return; }
         if (newLap > 0)
         {
             LapTime[newLap - 1].Stop();
@@ -384,7 +394,7 @@ public class PlayerController : NetworkBehaviour
         if (isLocalPlayer)
         {
             m_PlayerInfo.CurrentLap = newLap;
-            m_UIManager.UpdateLap(m_PlayerInfo.CurrentLap);
+            //m_UIManager.UpdateLap(m_PlayerInfo.CurrentLap);
         }
     }
 
