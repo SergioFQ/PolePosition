@@ -39,6 +39,17 @@ public class SetupPlayer : NetworkBehaviour
         {
             m_ID = connectionToClient.connectionId;
         }
+        /*if (!m_PolePositionManager.CheckSpace())
+        {
+            if (isServerOnly)
+            {
+                m_PolePositionManager.AddPlayer(m_PlayerInfo);
+            }
+            else
+            {
+                m_ID = connectionToClient.connectionId;
+            }
+        }*/
     }
 
     /// <summary>
@@ -48,11 +59,14 @@ public class SetupPlayer : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
+        //if (!m_PolePositionManager.CheckSpace())
+        //{
+            m_PlayerInfo.ID = m_PolePositionManager.m_Players.Count;
+            m_PlayerInfo.CurrentLap = -1;
+            m_PlayerInfo.LastPoint = -1;
+            m_PolePositionManager.AddPlayer(m_PlayerInfo);
+        //}
         
-        m_PlayerInfo.ID = m_PolePositionManager.m_Players.Count;
-        m_PlayerInfo.CurrentLap = -1;
-        m_PlayerInfo.LastPoint = -1;
-        m_PolePositionManager.AddPlayer(m_PlayerInfo);
         
     }
 
@@ -62,14 +76,15 @@ public class SetupPlayer : NetworkBehaviour
     /// </summary>
     public override void OnStartLocalPlayer()
     {
-        
-        m_PolePositionManager.m_SetUpPlayer = this;
-        //m_PlayerInfo.ID = m_ID;
-        CmdSelectName((m_UIManager.playerName == "") ? ("Player" + m_ID) : (m_UIManager.playerName));
-        CmdSelectColor(m_UIManager.colorNumber);
-        CmdSelectIdLap(m_PlayerInfo.ID);        
-        m_PlayerInfo.IsReady = false;
-
+        //if (!m_PolePositionManager.CheckSpace())
+        //{
+            m_PolePositionManager.m_SetUpPlayer = this;
+            //m_PlayerInfo.ID = m_ID;
+            CmdSelectName((m_UIManager.playerName == "") ? ("Player" + (m_PolePositionManager.m_Players.Count - 1)) : (m_UIManager.playerName));
+            CmdSelectColor(m_UIManager.colorNumber);
+            CmdSelectIdLap(m_PlayerInfo.ID);
+            m_PlayerInfo.IsReady = false;
+        //}
     }
 
     #endregion
@@ -201,9 +216,10 @@ public class SetupPlayer : NetworkBehaviour
         m_PolePositionManager.namesRanking += m_PlayerInfo.Name + "\n";
     }
 
-    [Command]
-    public void CmdRemovePlayer(int id)
-    {      
-       m_PolePositionManager.RemovePlayer(id);  
-    }
+    /*[Command]
+    public void CmdStarted()
+    {
+        m_PolePositionManager.started = true;
+    }*/
+
 }

@@ -51,6 +51,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button buttonExitServer;
     [SerializeField] private Button buttonMainMenuServer;
 
+    [Header("Abandonmet Victory")] [SerializeField] private GameObject abandonmetVictory;
+    [SerializeField] private Button buttonExitAbandonment;
+    [SerializeField] private Button buttonMainMenuAbandonment;
+
     private void Awake()
     {
         m_NetworkManager = FindObjectOfType<NetworkManager>();
@@ -69,6 +73,8 @@ public class UIManager : MonoBehaviour
         buttonMainMenuQuit.onClick.AddListener(() => ExitGameMainMenu());
         buttonExitServer.onClick.AddListener(()=>ExitGame());
         buttonMainMenuServer.onClick.AddListener(() => RestartGame());
+        buttonExitAbandonment.onClick.AddListener(() => ExitGame());
+        buttonMainMenuAbandonment.onClick.AddListener(() => RestartGame());
         ActivateMainMenu();
         textLaps.text = "Lap 0/5";
     }
@@ -143,6 +149,7 @@ public class UIManager : MonoBehaviour
         inGameHUD.SetActive(false);
         readyMenu.SetActive(false);
         serverHUD.SetActive(false);
+        abandonmetVictory.SetActive(false);
     }
 
     private void ActivateInGameHUD()
@@ -170,10 +177,25 @@ public class UIManager : MonoBehaviour
 
     private void StartClient()
     {
+
+        buttonClient.onClick.RemoveAllListeners();
         m_NetworkManager.StartClient();
         m_NetworkManager.networkAddress = inputFieldIP.text;
         playerName = inputFieldName.text;
         ActivateInGameHUD();
+
+
+        /*if (m_polePositionManager.CheckSpace())
+        {
+            Debug.Log("Lo siento mi ciela, dele pa fuera");
+            mainMenu.SetActive(false);
+        }
+        else
+        {
+            playerName = inputFieldName.text;
+            ActivateInGameHUD();
+        }*/
+
     }
 
     private void StartServer()
@@ -192,7 +214,11 @@ public class UIManager : MonoBehaviour
     {
         readyMenu.SetActive(false);
     }
-    
+    public void ActivateEndingByAbandonment()
+    {
+        inGameHUD.SetActive(false);
+        abandonmetVictory.SetActive(true);
+    }
     //cambiamos el color del coche dando click al botón de color las veces que sean necesarias hasta ver que aparece el texto del color deseado. Los colores son (ROJO, VERDE, AMARILLO Y BLANCO)
     private void SelectColor()
     {

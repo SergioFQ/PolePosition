@@ -400,6 +400,24 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    public void setInactiveByAbandonmet()
+    {
+        totalTime.Stop();
+        if(m_CurrentLap != -1)
+        {
+
+            LapTime[m_CurrentLap].Stop();
+        }
+        else
+        {
+            LapTime[0].Stop();
+        }
+        m_Rigidbody.velocity = Vector3.zero;
+        m_Rigidbody.angularVelocity = Vector3.zero;
+        isReady = false;
+    }
+
+
     public void SetInactive()
     {
         totalTime.Stop();

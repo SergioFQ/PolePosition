@@ -29,6 +29,7 @@ public class PolePositionManager : NetworkBehaviour
     Mutex readyPlayer = new Mutex();
     Mutex inRankingPlayer = new Mutex();
     Mutex mutexNamesRanking = new Mutex();
+    //[SyncVar] public bool started = false;
 
     private void Awake()
     {
@@ -44,6 +45,7 @@ public class PolePositionManager : NetworkBehaviour
         }
         m_UIManager = FindObjectOfType<UIManager>();
         m_UIManager.m_polePositionManager = this; //de esta forma sabemos la relacion de cada poleposition con ui manager de cada player
+        //started = false;
         //m_SetUpPlayer = FindObjectOfType<SetupPlayer>();
         //m_PlayerInfo = GetComponent<PlayerInfo>();
     }
@@ -97,13 +99,29 @@ public class PolePositionManager : NetworkBehaviour
         }
     }
 
+    [ClientRpc]
+    private void RpcVictoryByAbandonment()
+    {
+        m_Players[0].GetComponent<PlayerController>().m_UIManager.ActivateEndingByAbandonment();
+        m_Players[0].GetComponent<PlayerController>().setInactiveByAbandonmet();
+    }
+
+    private void CheckEnoughPlayers()
+    {
+        if(m_Players.Count <= 1)
+        {
+            m_Players[0].GetComponent<PlayerController>().setInactiveByAbandonmet();
+            RpcVictoryByAbandonment();
+        }
+    }
+
+
     public void UpdateRaceProgress()
     {
         ordenP = new List<PlayerInfo>();
         float[] orden = new float[4];
         if (isServer)
         {
-            //Debug.Log("------------------------------------------");
             for (int i = 0; i < m_Players.Count; i++)
             {
                 orden[i] = arcLengths[i];
@@ -114,7 +132,17 @@ public class PolePositionManager : NetworkBehaviour
             {
                 if (m_Players[i] == null)
                 {
-                    RemovePlayer(i);
+                    if (isServer)
+                    {
+                        
+                        RemovePlayer(i);
+                    }
+                    if (isServerOnly)
+                    {
+                        RpcDeletePlayer(i);
+                    }
+
+                    CheckEnoughPlayers();
                 }
                 else
                 {
@@ -170,7 +198,22 @@ public class PolePositionManager : NetworkBehaviour
 
 
     }
-    
+
+    /*public bool CheckSpace()
+    {
+        return started;
+    }*/
+
+    [ClientRpc]
+    private void RpcDeletePlayer(int id)
+    {
+        for (int i = id + 1; i < m_Players.Count; i++)
+        {
+            m_Players[i].ID--;
+        }
+        m_Players.RemoveAt(id);
+    }
+
     public void RemovePlayer(int id)
     {
         for (int i = id + 1; i < m_Players.Count; i++)
@@ -184,6 +227,7 @@ public class PolePositionManager : NetworkBehaviour
     {
         if (newValue>=m_Players.Count)
         {
+            //m_SetUpPlayer.CmdStarted();
             m_SetUpPlayer.m_PlayerController.isReady = true;
             m_UIManager.deactivateReadyMenu();
             m_SetUpPlayer.m_PlayerController.StartTime();
