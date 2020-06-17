@@ -113,8 +113,8 @@ public class PlayerController : NetworkBehaviour
         m_Rigidbody = GetComponent<Rigidbody>();
         m_PlayerInfo = GetComponent<PlayerInfo>();
         m_CurrentLap = -1;
-        frictionCurve = axleInfos[0].leftWheel.sidewaysFriction;
-        frictionCurve.extremumSlip = 0.2f;
+        //frictionCurve = axleInfos[0].leftWheel.sidewaysFriction;
+        //frictionCurve.extremumSlip = 0.2f;
         for (int i = 0; i < 2; i++)
             LapTime[i] = new Stopwatch();
         //pos = transform.position;
@@ -192,21 +192,21 @@ public class PlayerController : NetworkBehaviour
                     axleInfo.rightWheel.brakeTorque = footBrake;
                 }
                 //si la velocidad es demasiado baja (estamos parados), subimos el rozamiento lateral para impedir la deriva del jugador. Una vez en moviemiento volverá a su valor inicial que es 0.2
-                if (Math.Abs(axleInfo.leftWheel.attachedRigidbody.velocity.magnitude) < 0.25f)
+                /*if (Math.Abs(axleInfo.leftWheel.attachedRigidbody.velocity.magnitude) < 0.25f)
                 {
                     frictionCurve.extremumSlip = 0.3f;//nuevo valor rozamiento
                 }
                 else
                 {
                     frictionCurve.extremumSlip = 0.2f;
-                }
+                }*/
 
 
 
             }
             //asignamos el valor de la fricción lateral
-            axleInfo.leftWheel.sidewaysFriction = frictionCurve;
-            axleInfo.rightWheel.sidewaysFriction = frictionCurve;
+            //axleInfo.leftWheel.sidewaysFriction = frictionCurve;
+            //axleInfo.rightWheel.sidewaysFriction = frictionCurve;
 
 
 
@@ -218,7 +218,7 @@ public class PlayerController : NetworkBehaviour
         SteerHelper();
         SpeedLimiter();
         AddDownForce();
-        TractionControl();
+        //TractionControl();
     }
 
     #endregion
@@ -420,8 +420,8 @@ public class PlayerController : NetworkBehaviour
             mutexTimes.ReleaseMutex();
         }
         //print(finalTotalTime);
-        WheelFrictionCurve friction = axleInfos[0].leftWheel.forwardFriction;
-        friction.extremumSlip = 100;
+        //WheelFrictionCurve friction = axleInfos[0].leftWheel.forwardFriction;
+        //friction.extremumSlip = 100;
         m_Rigidbody.velocity = Vector3.zero;
         m_Rigidbody.angularVelocity = Vector3.zero;
         m_PolePositionManager.SetPosInRanking();
