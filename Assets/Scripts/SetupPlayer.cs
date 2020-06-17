@@ -52,6 +52,7 @@ public class SetupPlayer : NetworkBehaviour
             m_PlayerInfo.IsReady = false;
         }*/
         m_PlayerInfo.ID = m_PolePositionManager.m_Players.Count;
+        m_PlayerInfo.CurrentLap = -1;
         m_PlayerInfo.LastPoint = -1;
         m_PolePositionManager.AddPlayer(m_PlayerInfo);
         
@@ -66,7 +67,6 @@ public class SetupPlayer : NetworkBehaviour
         m_PolePositionManager.m_SetUpPlayer = this;
         //m_PlayerInfo.ID = m_ID;
         CmdSelectName((m_UIManager.playerName == "") ? ("Player" + m_ID) : (m_UIManager.playerName));
-        m_PlayerInfo.CurrentLap = 0;
         CmdSelectColor(m_UIManager.colorNumber);
         m_PlayerInfo.IsReady = false;
     }

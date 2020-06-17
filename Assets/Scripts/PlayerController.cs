@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using UnityEngine;
 /*
 	Documentation: https://mirror-networking.com/docs/Guides/NetworkBehaviour.html
@@ -44,6 +45,7 @@ public class PlayerController : NetworkBehaviour
     private TimeSpan timeSpan = new TimeSpan();
     [SyncVar(hook = nameof(FinalTotalTimeToString))] public string finalTotalTime = "";
     [SyncVar(hook = nameof(FinalBestLapTimeToString))] public string bestLapTime = "";
+    Mutex mutexTimes = new Mutex();
 
     private float Speed
     {
@@ -380,7 +382,7 @@ public class PlayerController : NetworkBehaviour
 
     private void SetLap(int old, int newLap)
     {
-        if (newLap == 0) { return; }
+        //if (newLap == 0) { return; }
         if (newLap > 0)
         {
             LapTime[newLap - 1].Stop();
@@ -394,7 +396,7 @@ public class PlayerController : NetworkBehaviour
         if (isLocalPlayer)
         {
             m_PlayerInfo.CurrentLap = newLap;
-            //m_UIManager.UpdateLap(m_PlayerInfo.CurrentLap);
+            m_UIManager.UpdateLap(m_PlayerInfo.CurrentLap);
         }
     }
 
@@ -413,7 +415,9 @@ public class PlayerController : NetworkBehaviour
             }
             m_PlayerInfo.FinalTime = (TimeToString(totalTime));
             m_PlayerInfo.BestLapTime = (TimeToString(aux));
+            mutexTimes.WaitOne();
             CmdUpdateTime(m_PlayerInfo.FinalTime, m_PlayerInfo.BestLapTime);
+            mutexTimes.ReleaseMutex();
         }
         //print(finalTotalTime);
         WheelFrictionCurve friction = axleInfos[0].leftWheel.forwardFriction;

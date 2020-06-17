@@ -26,6 +26,9 @@ public class PolePositionManager : NetworkBehaviour
     public SetupPlayer m_SetUpPlayer;
     [SyncVar(hook = nameof(UpdateNamesRanking))] public string namesRanking = "";
     [SyncVar(hook = nameof(SetOrderRanking))] public int ordenRanking = 0;
+    Mutex readyPlayer = new Mutex();
+    Mutex inRankingPlayer = new Mutex();
+    Mutex mutexNamesRanking = new Mutex();
 
     private void Awake()
     {
@@ -153,11 +156,15 @@ public class PolePositionManager : NetworkBehaviour
         if (isServer)
         {
             //Interlocked.Increment(ref numPlayers);
-            numPlayers += 1; 
+            readyPlayer.WaitOne();
+            numPlayers += 1;
+            readyPlayer.ReleaseMutex();
         }
         else
         {
+            readyPlayer.WaitOne();
             m_SetUpPlayer.CmdAddNumPlayer();
+            readyPlayer.ReleaseMutex();
         }
 
 
@@ -222,11 +229,15 @@ public class PolePositionManager : NetworkBehaviour
         
         if (isServer)
         {
+            mutexNamesRanking.WaitOne();
             namesRanking += m_SetUpPlayer.m_PlayerInfo.Name + "\n";
+            mutexNamesRanking.ReleaseMutex();
         }
         else
         {
+            mutexNamesRanking.WaitOne();
             m_SetUpPlayer.CmdUpdateNamesRanking();
+            mutexNamesRanking.ReleaseMutex();
         }
     }
 
@@ -236,12 +247,16 @@ public class PolePositionManager : NetworkBehaviour
         if (isServer)
         {
             //Interlocked.Increment(ref ordenRanking);
+            inRankingPlayer.WaitOne();
             ordenRanking++;
+            inRankingPlayer.ReleaseMutex();
         }
         else
         {
+            inRankingPlayer.WaitOne();
             m_SetUpPlayer.m_PlayerController.posRanking = posRanking[ordenRanking].transform.position;
             m_SetUpPlayer.CmdUpdateOrdenRanking();
+            inRankingPlayer.ReleaseMutex();
         }
     }
 

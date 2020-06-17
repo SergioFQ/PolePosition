@@ -32,7 +32,7 @@ public class LapManager : MonoBehaviour
 
             if (other.GetComponent<PlayerInfo>().LastPoint == 12)
             {
-                Debug.Log("Bien");
+                //Debug.Log("Bien");
                 other.GetComponent<PlayerInfo>().LastPoint = -1;
                 if (other.GetComponent<PlayerInfo>().CurrentLap == 1)
                 {
