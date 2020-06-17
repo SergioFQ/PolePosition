@@ -20,7 +20,6 @@ public class SetupPlayer : NetworkBehaviour
     public PlayerController m_PlayerController;
     public PlayerInfo m_PlayerInfo;
     public PolePositionManager m_PolePositionManager;
-    
 
     #region Start & Stop Callbacks
 
@@ -32,7 +31,14 @@ public class SetupPlayer : NetworkBehaviour
     public override void OnStartServer()
     {
         base.OnStartServer();
-        m_ID = connectionToClient.connectionId;
+        if (isServerOnly)
+        {
+            m_PolePositionManager.AddPlayer(m_PlayerInfo);
+        }
+        else
+        {
+            m_ID = connectionToClient.connectionId;
+        }
     }
 
     /// <summary>
@@ -42,15 +48,7 @@ public class SetupPlayer : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
-        /*if (isLocalPlayer)
-        {
-            m_PolePositionManager.m_SetUpPlayer = this;
-            //m_PlayerInfo.ID = m_ID;
-            CmdSelectName((m_UIManager.playerName == "") ? ("Player" + m_ID) : (m_UIManager.playerName));
-            m_PlayerInfo.CurrentLap = 0;
-            CmdSelectColor(m_UIManager.colorNumber);
-            m_PlayerInfo.IsReady = false;
-        }*/
+        
         m_PlayerInfo.ID = m_PolePositionManager.m_Players.Count;
         m_PlayerInfo.CurrentLap = -1;
         m_PlayerInfo.LastPoint = -1;
@@ -64,11 +62,14 @@ public class SetupPlayer : NetworkBehaviour
     /// </summary>
     public override void OnStartLocalPlayer()
     {
+        
         m_PolePositionManager.m_SetUpPlayer = this;
         //m_PlayerInfo.ID = m_ID;
         CmdSelectName((m_UIManager.playerName == "") ? ("Player" + m_ID) : (m_UIManager.playerName));
         CmdSelectColor(m_UIManager.colorNumber);
+        CmdSelectIdLap(m_PlayerInfo.ID);        
         m_PlayerInfo.IsReady = false;
+
     }
 
     #endregion
@@ -156,25 +157,42 @@ public class SetupPlayer : NetworkBehaviour
     [Command]
     void CmdSelectName(string name)
     {
+        if (isServerOnly)
+        {
+            m_PolePositionManager.m_Players[m_PolePositionManager.m_Players.Count-1].Name = name;
+            m_PolePositionManager.m_Players[m_PolePositionManager.m_Players.Count - 1].ID = m_ID;
+        }
         m_Name = name;
     }
     [Command]
     void CmdSelectColor(int colour)
     {
+        if (isServerOnly)
+        {
+            m_PolePositionManager.m_Players[m_PolePositionManager.m_Players.Count - 1].ColourID = colour;
+        }
         m_Colour = colour;
+    }
+    [Command]
+    void CmdSelectIdLap(int id)
+    {
+        if (isServerOnly)
+        {
+            m_PolePositionManager.m_Players[m_PolePositionManager.m_Players.Count - 1].ID = id;
+            m_PolePositionManager.m_Players[m_PolePositionManager.m_Players.Count - 1].CurrentLap = -1;
+            m_PolePositionManager.m_Players[m_PolePositionManager.m_Players.Count - 1].LastPoint = -1;
+        }
     }
 
     [Command]
     public void CmdAddNumPlayer()
     {
-        //Interlocked.Increment(ref m_PolePositionManager.numPlayers);
         m_PolePositionManager.numPlayers += 1;
     }
 
     [Command]
     public void CmdUpdateOrdenRanking()
     {
-        //Interlocked.Increment(ref m_PolePositionManager.ordenRanking);
         m_PolePositionManager.ordenRanking++;
     }
     [Command]

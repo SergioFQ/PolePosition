@@ -386,12 +386,12 @@ public class PlayerController : NetworkBehaviour
         if (newLap > 0)
         {
             LapTime[newLap - 1].Stop();
-        }
-        if (!(newLap >= LapTime.Length))
-        {
-            LapTime[newLap] = new Stopwatch();
-            LapTime[newLap].Start();
-        }
+            if (!(newLap >= LapTime.Length))
+            {
+                LapTime[newLap] = new Stopwatch();
+                LapTime[newLap].Start();
+            }
+        }       
 
         if (isLocalPlayer)
         {

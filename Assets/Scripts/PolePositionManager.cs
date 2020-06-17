@@ -50,6 +50,7 @@ public class PolePositionManager : NetworkBehaviour
 
     private void Update()
     {
+        
         if (m_Players.Count == 0)
             return;
         UpdateRaceProgress();
@@ -129,7 +130,7 @@ public class PolePositionManager : NetworkBehaviour
             }
             
             ordenP.Sort(new PlayerInfoComparer(orden));
-
+            
             myRaceOrder = " ";
             foreach (var _player in ordenP)
             {
@@ -195,8 +196,6 @@ public class PolePositionManager : NetworkBehaviour
         // Compute the projection of the car position to the closest circuit 
         // path segment and accumulate the arc-length along of the car along
         // the circuit.
-        //Debug.Log("ID: "+ID+"Size: "+m_Players.Count);
-        //Debug.Log("ID DEL PAVO " +m_Players[ID].ID);
         Vector3 carPos = this.m_Players[ID].transform.position;
         int segIdx;
         float carDist;

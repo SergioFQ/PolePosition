@@ -15,7 +15,6 @@ public class CameraController : MonoBehaviour
 
     private Vector3 m_Direction = Vector3.zero;
     private Vector3 pathDir;
-    //public Vector3 nextPoint;//siguiente punto del circuito
     private Camera mainCamera;
 
     // Start is called before the first frame update

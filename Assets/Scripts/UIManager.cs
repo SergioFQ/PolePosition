@@ -11,7 +11,6 @@ public class UIManager : MonoBehaviour
     public bool showGUI = true;
     public PolePositionManager m_polePositionManager;
     private NetworkManager m_NetworkManager;
-    public SetupPlayer m_SetUpPlayer;
 
     [Header("Main Menu")] [SerializeField] private GameObject mainMenu;
     [SerializeField] private Button buttonHost;
@@ -48,6 +47,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Text finalBestLap;
     [SerializeField] private Button buttonRestart;
 
+    [Header("Server HUD")] [SerializeField] private GameObject serverHUD;
+    [SerializeField] private Button buttonExitServer;
+    [SerializeField] private Button buttonMainMenuServer;
+
     private void Awake()
     {
         m_NetworkManager = FindObjectOfType<NetworkManager>();
@@ -64,6 +67,8 @@ public class UIManager : MonoBehaviour
         buttonInGameMainMenu.onClick.AddListener(() => RestartGame());
         buttonQuitGame.onClick.AddListener(() => ExitGame());
         buttonMainMenuQuit.onClick.AddListener(() => ExitGameMainMenu());
+        buttonExitServer.onClick.AddListener(()=>ExitGame());
+        buttonMainMenuServer.onClick.AddListener(() => RestartGame());
         ActivateMainMenu();
         textLaps.text = "Lap 0/5";
     }
@@ -137,6 +142,7 @@ public class UIManager : MonoBehaviour
         mainMenu.SetActive(true);
         inGameHUD.SetActive(false);
         readyMenu.SetActive(false);
+        serverHUD.SetActive(false);
     }
 
     private void ActivateInGameHUD()
@@ -173,7 +179,13 @@ public class UIManager : MonoBehaviour
     private void StartServer()
     {
         m_NetworkManager.StartServer();
-        ActivateInGameHUD();
+        ActivateServerHUD();
+    }
+
+    private void ActivateServerHUD()
+    {
+        mainMenu.SetActive(false);
+        serverHUD.SetActive(true);
     }
 
     public void deactivateReadyMenu()
