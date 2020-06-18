@@ -259,6 +259,7 @@ MonoBehaviour:
   syncInterval: 0.1
   m_PlayerController: {fileID: 0}
   m_PlayerInfo: {fileID: 0}
+  m_PolePositionManager: {fileID: 0}
 --- !u!114 &3466774584401487325
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -305,12 +306,9 @@ MonoBehaviour:
   m_UIManager: {fileID: 0}
   m_CurrentLap: -1
   isReady: 0
-  posRanking:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  posRanking: {x: 0, y: 0, z: 0}
+  finalTotalTime: 
+  bestLapTime: 
 --- !u!114 &6346869062069434778
 MonoBehaviour:
   m_ObjectHideFlags: 0

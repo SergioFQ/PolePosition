@@ -113,8 +113,8 @@ public class PlayerController : NetworkBehaviour
         m_Rigidbody = GetComponent<Rigidbody>();
         m_PlayerInfo = GetComponent<PlayerInfo>();
         m_CurrentLap = -1;
-        //frictionCurve = axleInfos[0].leftWheel.sidewaysFriction;
-        //frictionCurve.extremumSlip = 0.2f;
+        frictionCurve = axleInfos[0].leftWheel.sidewaysFriction;
+        frictionCurve.extremumSlip = 0.3f;
         for (int i = 0; i < 2; i++)
             LapTime[i] = new Stopwatch();
         //pos = transform.position;
@@ -192,27 +192,30 @@ public class PlayerController : NetworkBehaviour
                     axleInfo.rightWheel.brakeTorque = footBrake;
                 }
                 //si la velocidad es demasiado baja (estamos parados), subimos el rozamiento lateral para impedir la deriva del jugador. Una vez en moviemiento volverá a su valor inicial que es 0.2
-                /*if (Math.Abs(axleInfo.leftWheel.attachedRigidbody.velocity.magnitude) < 0.25f)
+                if (Math.Abs(axleInfo.leftWheel.attachedRigidbody.velocity.magnitude) < 0.25f)
                 {
                     frictionCurve.extremumSlip = 0.3f;//nuevo valor rozamiento
                 }
                 else
                 {
                     frictionCurve.extremumSlip = 0.2f;
-                }*/
+                }
 
 
 
             }
+
+
             //asignamos el valor de la fricción lateral
-            //axleInfo.leftWheel.sidewaysFriction = frictionCurve;
-            //axleInfo.rightWheel.sidewaysFriction = frictionCurve;
-
-
+            axleInfo.leftWheel.sidewaysFriction = frictionCurve;
+            axleInfo.rightWheel.sidewaysFriction = frictionCurve;
 
             ApplyLocalPositionToVisuals(axleInfo.leftWheel);//las ruedas estan al reves nombradas (es como si se viesen de frente y no de espaldas)
             ApplyLocalPositionToVisuals(axleInfo.rightWheel);
         }
+        //Transform pos = m_Rigidbody.transform;
+        //transform.position = pos.position;
+        CmdUpdatePos(m_PlayerInfo.ID, frictionCurve.extremumSlip);
 
         SavingPosition();
         SteerHelper();
@@ -232,7 +235,6 @@ public class PlayerController : NetworkBehaviour
             transform.Rotate(0, 0, 90);
             debugUpsideDown = false;
         }
-
 
         //si esta volcado
         if (Vector3.Dot(transform.up, Vector3.down) > 0 && isReady)
@@ -438,8 +440,7 @@ public class PlayerController : NetworkBehaviour
             mutexTimes.ReleaseMutex();
         }
         //print(finalTotalTime);
-        //WheelFrictionCurve friction = axleInfos[0].leftWheel.forwardFriction;
-        //friction.extremumSlip = 100;
+        WheelFrictionCurve friction = axleInfos[0].leftWheel.forwardFriction;
         m_Rigidbody.velocity = Vector3.zero;
         m_Rigidbody.angularVelocity = Vector3.zero;
         m_PolePositionManager.SetPosInRanking();
@@ -447,12 +448,16 @@ public class PlayerController : NetworkBehaviour
         transform.position = posRanking;
         foreach (var axleInfo in axleInfos)
         {
+            friction.extremumSlip = 100;
             axleInfo.leftWheel.motorTorque = 0;
             axleInfo.rightWheel.motorTorque = 0;
             axleInfo.leftWheel.brakeTorque = 1e+30f;
             axleInfo.rightWheel.brakeTorque = 1e+30f;
-            //axleInfo.leftWheel.forwardFriction = friction;
-            //axleInfo.rightWheel.forwardFriction = friction;
+            axleInfo.leftWheel.forwardFriction = friction;
+            axleInfo.rightWheel.forwardFriction = friction;
+            friction.extremumSlip = 0.3f;
+            axleInfo.rightWheel.sidewaysFriction = friction;
+            axleInfo.leftWheel.sidewaysFriction = friction;
         }
         isReady = false;
     }
@@ -470,6 +475,31 @@ public class PlayerController : NetworkBehaviour
     {
         m_CurrentLap++;
         m_PolePositionManager.m_Players[id].CurrentLap = m_CurrentLap;
+    }
+
+    [ClientRpc]
+    private void RpcUpdatePos (int id, float frictionCurve)
+    {
+        WheelFrictionCurve aux = m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[0].leftWheel.sidewaysFriction;
+        aux.extremumSlip = frictionCurve;
+        m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[0].leftWheel.sidewaysFriction = aux;
+        m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[0].rightWheel.sidewaysFriction = aux;
+        m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[1].leftWheel.sidewaysFriction = aux;
+        m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[1].rightWheel.sidewaysFriction = aux;
+        //if (m_PlayerInfo.ID != id){}
+    }
+
+    [Command]
+    private void CmdUpdatePos (int id, float frictionCurve)
+    {
+        WheelFrictionCurve aux = m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[0].leftWheel.sidewaysFriction;
+        aux.extremumSlip = frictionCurve;
+        m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[0].leftWheel.sidewaysFriction = aux;
+        m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[0].rightWheel.sidewaysFriction = aux;
+        m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[1].leftWheel.sidewaysFriction = aux;
+        m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[1].rightWheel.sidewaysFriction = aux;
+
+        RpcUpdatePos(id, frictionCurve);
     }
 
     public void StartTime()
