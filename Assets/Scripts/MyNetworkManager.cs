@@ -1,25 +1,25 @@
 ﻿using Mirror;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 
-/*public class MyNetworkManager : NetworkManager
-{
-    
-    public override void OnStopServer()
+    [AddComponentMenu("")]
+    public class MyNetworkManager : NetworkManager
     {
-        base.OnStopServer();
+        public string PlayerName { get; set; }
+    
 
-        if (isClient)
+        public class CreatePlayerMessage : MessageBase
         {
-            m_UIManager.ActivateServerOutHUD();
-            m_NetworkManager.StopClient();
-        }
-        else
-        {
-            m_PolePositionManager.RpcStoppedServer();
+            public string name;
         }
 
+        public override void OnClientConnect(NetworkConnection conn)
+        {
+            base.OnClientConnect(conn);
+
+            // tell the server to create a player with this name
+            conn.Send(new CreatePlayerMessage { name = PlayerName });
+        }
+        
     }
-}*/
+

@@ -12,6 +12,10 @@ public class UIManager : MonoBehaviour
     public PolePositionManager m_polePositionManager;
     private NetworkManager m_NetworkManager;
 
+    public int colorNumber = 0;
+    public string playerName = "";
+    public bool ready = false;
+
     [Header("Main Menu")] [SerializeField] private GameObject mainMenu;
     [SerializeField] private Button buttonHost;
     [SerializeField] private Button buttonClient;
@@ -20,9 +24,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button buttonColor;
     [SerializeField] private InputField inputFieldName;
     [SerializeField] private Button buttonMainMenuQuit;
-    public int colorNumber = 0;
-    public string playerName = "";
-    public bool ready = false;
+    [SerializeField] private Text textColorButton;
 
     [Header("In-Game HUD")]
     [SerializeField]
@@ -40,6 +42,8 @@ public class UIManager : MonoBehaviour
 
     [Header("Ready Menu")] [SerializeField] private GameObject readyMenu; //facilitamos la visualización del inspector poniendo este header
     [SerializeField] private Button buttonReady;
+    [SerializeField] private Button buttonColorLobby;
+    [SerializeField] private Text textColorButtonLobby;
 
     [Header("Game Over Menu")] [SerializeField] private GameObject gameOverMenu;
     [SerializeField] private Text finalPositions;
@@ -62,7 +66,7 @@ public class UIManager : MonoBehaviour
     [Header("Server Disconnected")] [SerializeField] private GameObject serverDisconnected;
     [SerializeField] private Button buttonExitServerOut;
     [SerializeField] private Button buttonMainMenuServerOut;
-
+    
     private void Awake()
     {
         m_NetworkManager = FindObjectOfType<NetworkManager>();
@@ -87,6 +91,7 @@ public class UIManager : MonoBehaviour
         buttonMainMenuFullGame.onClick.AddListener(() => RestartGame());
         buttonExitServerOut.onClick.AddListener(() => ExitGame());
         buttonMainMenuServerOut.onClick.AddListener(() => RestartGame());
+        buttonColorLobby.onClick.AddListener(()=> SelectColorLobby());
         ActivateMainMenu();
         textLaps.text = "Lap 0/5";
     }
@@ -255,24 +260,45 @@ public class UIManager : MonoBehaviour
     }
     //cambiamos el color del coche dando click al botón de color las veces que sean necesarias hasta ver que aparece el texto del color deseado. Los colores son (ROJO, VERDE, AMARILLO Y BLANCO)
     private void SelectColor()
-    {
-        Text text = buttonColor.GetComponentInChildren<Text>();
-        colorNumber++;
-        if (colorNumber >= 4) { colorNumber = 0; }
+    {        
+        colorNumber = (colorNumber + 1) % 4;
         switch (colorNumber)
         {
             case 0:
-                text.text = "COLOR: RED";
+                textColorButton.text = "COLOR: RED";
                 break;
             case 1:
-                text.text = "COLOR: GREEN";
+                textColorButton.text = "COLOR: GREEN";
                 break;
             case 2:
-                text.text = "COLOR: ORANGE";
+                textColorButton.text = "COLOR: ORANGE";
                 break;
             case 3:
-                text.text = "COLOR: WHITE";
+                textColorButton.text = "COLOR: WHITE";
                 break;
         }
+        textColorButtonLobby.text = textColorButton.text;
+    }
+
+    private void SelectColorLobby()
+    {       
+        colorNumber = (colorNumber+1)%4;
+        switch (colorNumber)
+        {
+            case 0:
+                textColorButtonLobby.text = "COLOR: RED";
+                break;
+            case 1:
+                textColorButtonLobby.text = "COLOR: GREEN";
+                break;
+            case 2:
+                textColorButtonLobby.text = "COLOR: ORANGE";
+                break;
+            case 3:
+                textColorButtonLobby.text = "COLOR: WHITE";
+                break;
+        }
+            m_polePositionManager.m_SetUpPlayer.CmdSelectColor(colorNumber);
+        
     }
 }

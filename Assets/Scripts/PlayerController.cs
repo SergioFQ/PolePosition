@@ -216,7 +216,7 @@ public class PlayerController : NetworkBehaviour
         }
         //Transform pos = m_Rigidbody.transform;
         //transform.position = pos.position;
-        CmdUpdatePos(m_PlayerInfo.ID, frictionCurve.extremumSlip);
+        //CmdUpdatePos(m_PlayerInfo.ID, frictionCurve.extremumSlip);
 
         SavingPosition();
         SteerHelper();

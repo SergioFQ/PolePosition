@@ -37,10 +37,6 @@ public class SetupPlayer : NetworkBehaviour
             {
                 m_PolePositionManager.AddPlayer(m_PlayerInfo);
             }
-            else
-            {
-                print("f");
-            }
 
         }
         else
@@ -76,12 +72,10 @@ public class SetupPlayer : NetworkBehaviour
         print("Started " + m_PolePositionManager.started);
         if (!m_PolePositionManager.started && !m_PolePositionManager.full)
         {
-            print("f");
             m_PolePositionManager.AddPlayer(m_PlayerInfo);
         }
         else
         {
-            print("f");
             if (isLocalPlayer)
             {
                 m_UIManager.ActivateFullGameHUD();
@@ -89,7 +83,6 @@ public class SetupPlayer : NetworkBehaviour
 
             }
         }
-        //}
         
         
     }
@@ -155,7 +148,14 @@ public class SetupPlayer : NetworkBehaviour
     {
         if (Camera.main != null) Camera.main.gameObject.GetComponent<CameraController>().m_Focus = this.gameObject;
     }
+    private void OnDestroy()
+    {
+        if (isLocalPlayer)
+        {
+            m_UIManager.ActivateServerOutHUD();
 
+        }
+    }
     public void UnfocusCamera(Vector3 cameraPos, Vector3 targetPos)
     {
         Camera.main.gameObject.GetComponent<CameraController>().m_Focus = null;
@@ -177,19 +177,27 @@ public class SetupPlayer : NetworkBehaviour
         {
             case 0:
                 transform.Find("raceCar").Find("body_red").gameObject.SetActive(true);
+                transform.Find("raceCar").Find("body_orange").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_white").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_green").gameObject.SetActive(false);
                 break;
             case 1:
                 transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_orange").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_white").gameObject.SetActive(false);
                 transform.Find("raceCar").Find("body_green").gameObject.SetActive(true);
-
                 break;
             case 2:
                 transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
                 transform.Find("raceCar").Find("body_orange").gameObject.SetActive(true);
+                transform.Find("raceCar").Find("body_white").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_green").gameObject.SetActive(false);
                 break;
             case 3:
                 transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_orange").gameObject.SetActive(false);
                 transform.Find("raceCar").Find("body_white").gameObject.SetActive(true);
+                transform.Find("raceCar").Find("body_green").gameObject.SetActive(false);
                 break;
         }
     }
@@ -205,11 +213,13 @@ public class SetupPlayer : NetworkBehaviour
         m_Name = name;
     }
     [Command]
-    void CmdSelectColor(int colour)
+    public void CmdSelectColor(int colour)
     {
         if (isServerOnly)
         {
-            m_PolePositionManager.m_Players[m_PolePositionManager.m_Players.Count - 1].ColourID = colour;
+            //m_PolePositionManager.m_Players[m_s].ColourID = colour;
+            //m_PlayerInfo.ColourID = colour;
+            setColour(0,colour);
         }
         m_Colour = colour;
     }
@@ -247,4 +257,18 @@ public class SetupPlayer : NetworkBehaviour
         m_PolePositionManager.started = true;
     }
 
+    public static event Action<SetupPlayer, string> OnMessage;
+
+    [Command]
+    public void CmdSend(string message)
+    {
+        if (message.Trim() != "")
+            RpcReceive(message.Trim());
+    }
+
+    [ClientRpc]
+    public void RpcReceive(string message)
+    {
+        OnMessage?.Invoke(this, message);
+    }
 }

@@ -122,7 +122,7 @@ public class PolePositionManager : NetworkBehaviour
 
     private void CheckEnoughPlayers()
     {
-        if(m_Players.Count <= 1)
+        if(m_Players.Count == 1)
         {
             m_Players[0].GetComponent<PlayerController>().setInactiveByAbandonmet();
             RpcVictoryByAbandonment();
@@ -246,7 +246,7 @@ public class PolePositionManager : NetworkBehaviour
 
     private void numPlayersHook(int old, int newValue)
     {
-        if (newValue>=m_Players.Count && !started)
+        if ((newValue>=m_Players.Count && m_Players.Count>1) && !started)
         {
             started = true;
             if (m_SetUpPlayer != null)
