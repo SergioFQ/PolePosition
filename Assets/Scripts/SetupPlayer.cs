@@ -33,7 +33,15 @@ public class SetupPlayer : NetworkBehaviour
         base.OnStartServer();
         if (isServerOnly)
         {
-            m_PolePositionManager.AddPlayer(m_PlayerInfo);
+            if (!m_PolePositionManager.started && !m_PolePositionManager.full)
+            {
+                m_PolePositionManager.AddPlayer(m_PlayerInfo);
+            }
+            else
+            {
+                print("f");
+            }
+
         }
         else
         {
@@ -52,6 +60,8 @@ public class SetupPlayer : NetworkBehaviour
         }*/
     }
 
+   
+
     /// <summary>
     /// Called on every NetworkBehaviour when it is activated on a client.
     /// <para>Objects on the host have this function called, as there is a local client on the host. The values of SyncVars on object are guaranteed to be initialized correctly with the latest state from the server when this function is called on the client.</para>
@@ -59,12 +69,26 @@ public class SetupPlayer : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
-        //if (!m_PolePositionManager.CheckSpace())
-        //{
-            m_PlayerInfo.ID = m_PolePositionManager.m_Players.Count;
-            m_PlayerInfo.CurrentLap = -1;
-            m_PlayerInfo.LastPoint = -1;
+        print("Entre jugador");
+        m_PlayerInfo.ID = m_PolePositionManager.m_Players.Count;
+        m_PlayerInfo.CurrentLap = -1;
+        m_PlayerInfo.LastPoint = -1;
+        print("Started " + m_PolePositionManager.started);
+        if (!m_PolePositionManager.started && !m_PolePositionManager.full)
+        {
+            print("f");
             m_PolePositionManager.AddPlayer(m_PlayerInfo);
+        }
+        else
+        {
+            print("f");
+            if (isLocalPlayer)
+            {
+                m_UIManager.ActivateFullGameHUD();
+                m_NetworkManager.StopClient();
+
+            }
+        }
         //}
         
         
@@ -76,21 +100,23 @@ public class SetupPlayer : NetworkBehaviour
     /// </summary>
     public override void OnStartLocalPlayer()
     {
-        //if (!m_PolePositionManager.CheckSpace())
-        //{
-            m_PolePositionManager.m_SetUpPlayer = this;
-            //m_PlayerInfo.ID = m_ID;
+        
+        m_PolePositionManager.m_SetUpPlayer = this;
+        if (!m_PolePositionManager.started)
+        {
             CmdSelectName((m_UIManager.playerName == "") ? ("Player" + (m_PolePositionManager.m_Players.Count - 1)) : (m_UIManager.playerName));
             CmdSelectColor(m_UIManager.colorNumber);
             CmdSelectIdLap(m_PlayerInfo.ID);
             m_PlayerInfo.IsReady = false;
-        //}
+
+        }
     }
 
     #endregion
 
     private void Awake()
     {
+        print("Awake");
         m_PlayerInfo = GetComponent<PlayerInfo>();
         m_PlayerController = GetComponent<PlayerController>();
         m_NetworkManager = FindObjectOfType<NetworkManager>();
@@ -168,7 +194,6 @@ public class SetupPlayer : NetworkBehaviour
         }
     }
 
-    
     [Command]
     void CmdSelectName(string name)
     {
@@ -216,10 +241,10 @@ public class SetupPlayer : NetworkBehaviour
         m_PolePositionManager.namesRanking += m_PlayerInfo.Name + "\n";
     }
 
-    /*[Command]
+    [Command]
     public void CmdStarted()
     {
         m_PolePositionManager.started = true;
-    }*/
+    }
 
 }

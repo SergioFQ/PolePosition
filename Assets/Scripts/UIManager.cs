@@ -55,6 +55,14 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button buttonExitAbandonment;
     [SerializeField] private Button buttonMainMenuAbandonment;
 
+    [Header("Full or started race")] [SerializeField] private GameObject fullGame;
+    [SerializeField] private Button buttonExitFullGame;
+    [SerializeField] private Button buttonMainMenuFullGame;
+
+    [Header("Server Disconnected")] [SerializeField] private GameObject serverDisconnected;
+    [SerializeField] private Button buttonExitServerOut;
+    [SerializeField] private Button buttonMainMenuServerOut;
+
     private void Awake()
     {
         m_NetworkManager = FindObjectOfType<NetworkManager>();
@@ -75,11 +83,15 @@ public class UIManager : MonoBehaviour
         buttonMainMenuServer.onClick.AddListener(() => RestartGame());
         buttonExitAbandonment.onClick.AddListener(() => ExitGame());
         buttonMainMenuAbandonment.onClick.AddListener(() => RestartGame());
+        buttonExitFullGame.onClick.AddListener(() => ExitGame());
+        buttonMainMenuFullGame.onClick.AddListener(() => RestartGame());
+        buttonExitServerOut.onClick.AddListener(() => ExitGame());
+        buttonMainMenuServerOut.onClick.AddListener(() => RestartGame());
         ActivateMainMenu();
         textLaps.text = "Lap 0/5";
     }
 
-    private void ExitGame()
+    public void ExitGame()
     {
         m_polePositionManager.EndGame();
         Destroy(m_NetworkManager.gameObject);
@@ -149,6 +161,8 @@ public class UIManager : MonoBehaviour
         inGameHUD.SetActive(false);
         readyMenu.SetActive(false);
         serverHUD.SetActive(false);
+        serverDisconnected.SetActive(false);
+        fullGame.SetActive(false);
         abandonmetVictory.SetActive(false);
     }
 
@@ -165,6 +179,25 @@ public class UIManager : MonoBehaviour
         inGameHUD.SetActive(false);
         readyMenu.SetActive(false);
         gameOverMenu.SetActive(true);
+        Debug.Log("GameOver");
+    }
+
+    public void ActivateFullGameHUD()
+    {
+        mainMenu.SetActive(false);
+        inGameHUD.SetActive(false);
+        readyMenu.SetActive(false);
+        fullGame.SetActive(true);
+        Debug.Log("GameOver");
+    }
+
+    public void ActivateServerOutHUD()
+    {
+        mainMenu.SetActive(false);
+        inGameHUD.SetActive(false);
+        readyMenu.SetActive(false);
+        fullGame.SetActive(false);
+        serverDisconnected.SetActive(true);
         Debug.Log("GameOver");
     }
 
@@ -217,6 +250,7 @@ public class UIManager : MonoBehaviour
     public void ActivateEndingByAbandonment()
     {
         inGameHUD.SetActive(false);
+        readyMenu.SetActive(false);
         abandonmetVictory.SetActive(true);
     }
     //cambiamos el color del coche dando click al botón de color las veces que sean necesarias hasta ver que aparece el texto del color deseado. Los colores son (ROJO, VERDE, AMARILLO Y BLANCO)

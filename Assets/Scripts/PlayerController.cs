@@ -123,6 +123,7 @@ public class PlayerController : NetworkBehaviour
 
     public void Update()
     {
+        
         InputAcceleration = Input.GetAxis("Vertical");
         InputSteering = Input.GetAxis(("Horizontal"));
         InputBrake = Input.GetAxis("Jump");
@@ -227,6 +228,7 @@ public class PlayerController : NetworkBehaviour
     #endregion
 
     #region Methods
+
 
     private void SavingPosition()
     {
@@ -492,14 +494,18 @@ public class PlayerController : NetworkBehaviour
     [Command]
     private void CmdUpdatePos (int id, float frictionCurve)
     {
-        WheelFrictionCurve aux = m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[0].leftWheel.sidewaysFriction;
-        aux.extremumSlip = frictionCurve;
-        m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[0].leftWheel.sidewaysFriction = aux;
-        m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[0].rightWheel.sidewaysFriction = aux;
-        m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[1].leftWheel.sidewaysFriction = aux;
-        m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[1].rightWheel.sidewaysFriction = aux;
+        if(m_PolePositionManager.m_Players[id] != null)
+        {
+            WheelFrictionCurve aux = m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[0].leftWheel.sidewaysFriction;
+            aux.extremumSlip = frictionCurve;
+            m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[0].leftWheel.sidewaysFriction = aux;
+            m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[0].rightWheel.sidewaysFriction = aux;
+            m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[1].leftWheel.sidewaysFriction = aux;
+            m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[1].rightWheel.sidewaysFriction = aux;
 
-        RpcUpdatePos(id, frictionCurve);
+            RpcUpdatePos(id, frictionCurve);
+        }
+        
     }
 
     public void StartTime()
@@ -540,5 +546,7 @@ public class PlayerController : NetworkBehaviour
             CmdIncreaseLap(id);
         }
     }
+
+    
     #endregion
 }

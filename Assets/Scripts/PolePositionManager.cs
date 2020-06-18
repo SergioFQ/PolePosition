@@ -29,7 +29,8 @@ public class PolePositionManager : NetworkBehaviour
     Mutex readyPlayer = new Mutex();
     Mutex inRankingPlayer = new Mutex();
     Mutex mutexNamesRanking = new Mutex();
-    //[SyncVar] public bool started = false;
+    [SyncVar] public bool started = false;
+    [SyncVar] public bool full = false;
 
     private void Awake()
     {
@@ -45,11 +46,15 @@ public class PolePositionManager : NetworkBehaviour
         }
         m_UIManager = FindObjectOfType<UIManager>();
         m_UIManager.m_polePositionManager = this; //de esta forma sabemos la relacion de cada poleposition con ui manager de cada player
-        //started = false;
+        if (isServer)
+        {
+            started = false;
+            full = false;
+        }
         //m_SetUpPlayer = FindObjectOfType<SetupPlayer>();
         //m_PlayerInfo = GetComponent<PlayerInfo>();
     }
-
+    
     private void Update()
     {
         
@@ -62,7 +67,10 @@ public class PolePositionManager : NetworkBehaviour
     {
         m_Players.Add(player);
         arcLengths = new float[m_Players.Count];
-
+        if(m_Players.Count == 4)
+        {
+            full = true;
+        }
     }
 
     private class PlayerInfoComparer : Comparer<PlayerInfo>
@@ -104,6 +112,12 @@ public class PolePositionManager : NetworkBehaviour
     {
         m_Players[0].GetComponent<PlayerController>().m_UIManager.ActivateEndingByAbandonment();
         m_Players[0].GetComponent<PlayerController>().setInactiveByAbandonmet();
+    }
+
+    [ClientRpc]
+    public void RpcStoppedServer()
+    {
+        m_UIManager.ActivateServerOutHUD();
     }
 
     private void CheckEnoughPlayers()
@@ -172,6 +186,7 @@ public class PolePositionManager : NetworkBehaviour
     {
         if (isServer)
         {
+            RpcStoppedServer();
             networkManager.StopHost();
         }
         else
@@ -182,27 +197,33 @@ public class PolePositionManager : NetworkBehaviour
     
     public void startRace()
     {
-        if (isServer)
+        if (!started)
         {
-            //Interlocked.Increment(ref numPlayers);
-            readyPlayer.WaitOne();
-            numPlayers += 1;
-            readyPlayer.ReleaseMutex();
-        }
-        else
-        {
-            readyPlayer.WaitOne();
-            m_SetUpPlayer.CmdAddNumPlayer();
-            readyPlayer.ReleaseMutex();
-        }
+            if (isServer)
+            {
+                //Interlocked.Increment(ref numPlayers);
 
-
+                readyPlayer.WaitOne();
+                numPlayers += 1;
+                readyPlayer.ReleaseMutex();
+                if (isServerOnly && numPlayers >= m_Players.Count)
+                {
+                    started = true;
+                }
+            }
+            else
+            {
+                readyPlayer.WaitOne();
+                m_SetUpPlayer.CmdAddNumPlayer();
+                readyPlayer.ReleaseMutex();
+            }
+        }
     }
 
-    /*public bool CheckSpace()
+    public bool CheckSpace()
     {
         return started;
-    }*/
+    }
 
     [ClientRpc]
     private void RpcDeletePlayer(int id)
@@ -225,12 +246,32 @@ public class PolePositionManager : NetworkBehaviour
 
     private void numPlayersHook(int old, int newValue)
     {
-        if (newValue>=m_Players.Count)
+        if (newValue>=m_Players.Count && !started)
         {
+            started = true;
+            if (m_SetUpPlayer != null)
+            {
+                m_SetUpPlayer.CmdStarted();
+            }
+            /*if (isServer)
+            {
+                started = true;
+            }*/
+            /*else
+            {
+                m_SetUpPlayer.CmdStarted();
+            }*/
+            //
             //m_SetUpPlayer.CmdStarted();
-            m_SetUpPlayer.m_PlayerController.isReady = true;
+            //Debug.Log(m_Started + " " + started);
+            if (m_SetUpPlayer != null && m_SetUpPlayer.m_PlayerController != null)
+            {
+                m_SetUpPlayer.m_PlayerController.isReady = true;
+                m_SetUpPlayer.m_PlayerController.StartTime();
+            }
+            
             m_UIManager.deactivateReadyMenu();
-            m_SetUpPlayer.m_PlayerController.StartTime();
+            
         }
     }
 
@@ -312,5 +353,8 @@ public class PolePositionManager : NetworkBehaviour
     {
         m_UIManager.UpdateRanking(newOR);
     }
-
+    /*private void UpdateRaceStart( bool old, bool newStart)
+    {
+        m_Started = newStart;
+    }*/
 }
