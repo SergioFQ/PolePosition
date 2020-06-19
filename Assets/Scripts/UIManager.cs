@@ -217,8 +217,8 @@ public class UIManager : MonoBehaviour
     {
 
         buttonClient.onClick.RemoveAllListeners();
+        m_NetworkManager.networkAddress = (inputFieldIP.text != "") ? inputFieldIP.text : "localhost";
         m_NetworkManager.StartClient();
-        m_NetworkManager.networkAddress = inputFieldIP.text;
         playerName = inputFieldName.text;
         ActivateInGameHUD();
 
