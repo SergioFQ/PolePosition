@@ -20,6 +20,7 @@ public class SetupPlayer : NetworkBehaviour
     public PlayerController m_PlayerController;
     public PlayerInfo m_PlayerInfo;
     public PolePositionManager m_PolePositionManager;
+    public MyNetworkManager m_MyNetworkManager;
 
     #region Start & Stop Callbacks
 
@@ -37,12 +38,15 @@ public class SetupPlayer : NetworkBehaviour
             {
                 m_PolePositionManager.AddPlayer(m_PlayerInfo);
             }
-
+            m_ID = connectionToClient.connectionId - 1;
         }
         else
         {
             m_ID = connectionToClient.connectionId;
         }
+        
+        
+        
         /*if (!m_PolePositionManager.CheckSpace())
         {
             if (isServerOnly)
@@ -97,7 +101,7 @@ public class SetupPlayer : NetworkBehaviour
         m_PolePositionManager.m_SetUpPlayer = this;
         if (!m_PolePositionManager.started)
         {
-            CmdSelectName((m_UIManager.playerName == "") ? ("Player" + (m_PolePositionManager.m_Players.Count - 1)) : (m_UIManager.playerName));
+            CmdSelectName((m_UIManager.playerName == "") ? ("Player" + (/*m_PolePositionManager.m_Players.Count - 1*/ m_ID )) : (m_UIManager.playerName));
             CmdSelectColor(m_UIManager.colorNumber);
             CmdSelectIdLap(m_PlayerInfo.ID);
             m_PlayerInfo.IsReady = false;
@@ -115,6 +119,8 @@ public class SetupPlayer : NetworkBehaviour
         m_NetworkManager = FindObjectOfType<NetworkManager>();
         m_PolePositionManager = FindObjectOfType<PolePositionManager>();
         m_UIManager = FindObjectOfType<UIManager>();
+        m_MyNetworkManager = FindObjectOfType<MyNetworkManager>();
+        m_MyNetworkManager.m_SetUpPlayer = this;
     }
 
     // Start is called before the first frame update
@@ -207,7 +213,8 @@ public class SetupPlayer : NetworkBehaviour
     {
         if (isServerOnly)
         {
-            m_PolePositionManager.m_Players[m_PolePositionManager.m_Players.Count-1].Name = name;
+            print(m_PolePositionManager.m_Players.Count - 1);
+            m_PolePositionManager.m_Players[m_PolePositionManager.m_Players.Count - 1].Name = name;
             m_PolePositionManager.m_Players[m_PolePositionManager.m_Players.Count - 1].ID = m_ID;
         }
         m_Name = name;

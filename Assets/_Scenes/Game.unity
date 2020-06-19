@@ -16116,6 +16116,12 @@ MonoBehaviour:
   autoCreatePlayer: 1
   playerSpawnMethod: 1
   spawnPrefabs: []
+  m_SetUpPlayer: {fileID: 0}
+  startingPoints:
+  - {fileID: 9126478173077015719}
+  - {fileID: 9126478172654520499}
+  - {fileID: 9126478172896605522}
+  - {fileID: 9126478173010760338}
 --- !u!114 &2140735091
 MonoBehaviour:
   m_ObjectHideFlags: 0

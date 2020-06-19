@@ -407,9 +407,8 @@ public class PlayerController : NetworkBehaviour
     public void setInactiveByAbandonmet()
     {
         totalTime.Stop();
-        if(m_CurrentLap != -1)
+        if(m_CurrentLap != -1 && m_CurrentLap < 2)
         {
-
             LapTime[m_CurrentLap].Stop();
         }
         else

@@ -31,6 +31,7 @@ public class PolePositionManager : NetworkBehaviour
     Mutex mutexNamesRanking = new Mutex();
     [SyncVar] public bool started = false;
     [SyncVar] public bool full = false;
+    private MyNetworkManager m_MyNetworkManager;
 
     private void Awake()
     {
@@ -51,6 +52,7 @@ public class PolePositionManager : NetworkBehaviour
             started = false;
             full = false;
         }
+        m_MyNetworkManager = FindObjectOfType<MyNetworkManager>();
         //m_SetUpPlayer = FindObjectOfType<SetupPlayer>();
         //m_PlayerInfo = GetComponent<PlayerInfo>();
     }
@@ -155,7 +157,7 @@ public class PolePositionManager : NetworkBehaviour
                     {
                         RpcDeletePlayer(i);
                     }
-
+                    full = false;
                     CheckEnoughPlayers();
                 }
                 else
@@ -237,11 +239,25 @@ public class PolePositionManager : NetworkBehaviour
 
     public void RemovePlayer(int id)
     {
+        
         for (int i = id + 1; i < m_Players.Count; i++)
         {
             m_Players[i].ID--;
         }
         m_Players.RemoveAt(id);
+        takenPositions(id);
+    }
+
+    public void takenPositions(int id)
+    {
+        for(int i = 0; i< 4; i++)
+        {
+            if (m_MyNetworkManager.positionsIDs[i] > id)
+            {
+                m_MyNetworkManager.positionsIDs[i]--;
+            }
+        }
+        m_MyNetworkManager.positionsIDs[id] = -1;
     }
 
     private void numPlayersHook(int old, int newValue)
