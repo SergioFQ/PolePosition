@@ -13223,6 +13223,7 @@ MonoBehaviour:
   buttonReady: {fileID: 978230332}
   buttonColorLobby: {fileID: 1672647156}
   textColorButtonLobby: {fileID: 890041505}
+  chat: {fileID: 611505465}
   gameOverMenu: {fileID: 268735459}
   finalPositions: {fileID: 731163113}
   finalTotalTime: {fileID: 1168216609}
@@ -16122,6 +16123,7 @@ MonoBehaviour:
   - {fileID: 9126478172654520499}
   - {fileID: 9126478172896605522}
   - {fileID: 9126478173010760338}
+  positionsIDs: 00000000000000000000000000000000
 --- !u!114 &2140735091
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -44,6 +44,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button buttonReady;
     [SerializeField] private Button buttonColorLobby;
     [SerializeField] private Text textColorButtonLobby;
+    [SerializeField] private MyChat chat;
 
     [Header("Game Over Menu")] [SerializeField] private GameObject gameOverMenu;
     [SerializeField] private Text finalPositions;
@@ -112,6 +113,7 @@ public class UIManager : MonoBehaviour
     {
         m_polePositionManager.EndGame();
         Destroy(m_NetworkManager.gameObject);
+        Destroy(chat);
         SceneManager.LoadScene("Game");
     }
     private void StartRace()
