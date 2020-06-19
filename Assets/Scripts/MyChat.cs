@@ -41,6 +41,7 @@ using UnityEngine.UI;
 
         internal void AppendMessage(string message)
         {
+            
             StartCoroutine(AppendAndScroll(message));
         }
 

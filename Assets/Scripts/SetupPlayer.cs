@@ -21,6 +21,7 @@ public class SetupPlayer : NetworkBehaviour
     public PlayerInfo m_PlayerInfo;
     public PolePositionManager m_PolePositionManager;
     public MyNetworkManager m_MyNetworkManager;
+    private MyChat m_chat;
 
     #region Start & Stop Callbacks
 
@@ -74,6 +75,7 @@ public class SetupPlayer : NetworkBehaviour
         m_PlayerInfo.CurrentLap = -1;
         m_PlayerInfo.LastPoint = -1;
         print("Started " + m_PolePositionManager.started);
+        //if (m_chat == null) m_chat = FindObjectOfType<MyChat>();
         if (!m_PolePositionManager.started && !m_PolePositionManager.full)
         {
             m_PolePositionManager.AddPlayer(m_PlayerInfo);
@@ -244,18 +246,24 @@ public class SetupPlayer : NetworkBehaviour
     [Command]
     public void CmdAddNumPlayer()
     {
+        m_PolePositionManager.readyPlayer.WaitOne();
         m_PolePositionManager.numPlayers += 1;
+        m_PolePositionManager.readyPlayer.ReleaseMutex();
     }
 
     [Command]
     public void CmdUpdateOrdenRanking()
     {
+        m_PolePositionManager.inRankingPlayer.WaitOne();
         m_PolePositionManager.ordenRanking++;
+        m_PolePositionManager.inRankingPlayer.ReleaseMutex();
     }
     [Command]
     public void CmdUpdateNamesRanking()
     {
+        m_PolePositionManager.mutexNamesRanking.WaitOne();
         m_PolePositionManager.namesRanking += m_PlayerInfo.Name + "\n";
+        m_PolePositionManager.mutexNamesRanking.ReleaseMutex();
     }
 
     [Command]

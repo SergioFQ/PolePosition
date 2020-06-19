@@ -26,17 +26,19 @@ public class PolePositionManager : NetworkBehaviour
     public SetupPlayer m_SetUpPlayer;
     [SyncVar(hook = nameof(UpdateNamesRanking))] public string namesRanking = "";
     [SyncVar(hook = nameof(SetOrderRanking))] public int ordenRanking = 0;
-    Mutex readyPlayer = new Mutex();
-    Mutex inRankingPlayer = new Mutex();
-    Mutex mutexNamesRanking = new Mutex();
+    public Mutex readyPlayer = new Mutex();
+    public Mutex inRankingPlayer = new Mutex();
+    public Mutex mutexNamesRanking = new Mutex();
     [SyncVar] public bool started = false;
     [SyncVar] public bool full = false;
     private MyNetworkManager m_MyNetworkManager;
+    private MyChat m_chat;
 
     private void Awake()
     {
         if (networkManager == null) networkManager = FindObjectOfType<NetworkManager>();
         if (m_CircuitController == null) m_CircuitController = FindObjectOfType<CircuitController>();
+        if (m_chat == null) m_chat = FindObjectOfType<MyChat>();
         posSphere = new Vector3[4];        
         m_DebuggingSpheres = new GameObject[networkManager.maxConnections];
         for (int i = 0; i < networkManager.maxConnections; ++i)
@@ -74,7 +76,11 @@ public class PolePositionManager : NetworkBehaviour
             full = true;
         }
     }
+    /*public void activateChat()
+    {
 
+        if (m_chat == null) m_chat = FindObjectOfType<MyChat>();
+    }*/
     private class PlayerInfoComparer : Comparer<PlayerInfo>
     {
         float[] m_ArcLengths;
@@ -215,9 +221,7 @@ public class PolePositionManager : NetworkBehaviour
             }
             else
             {
-                readyPlayer.WaitOne();
                 m_SetUpPlayer.CmdAddNumPlayer();
-                readyPlayer.ReleaseMutex();
             }
         }
     }
@@ -335,9 +339,8 @@ public class PolePositionManager : NetworkBehaviour
         }
         else
         {
-            mutexNamesRanking.WaitOne();
+            
             m_SetUpPlayer.CmdUpdateNamesRanking();
-            mutexNamesRanking.ReleaseMutex();
         }
     }
 
@@ -353,10 +356,8 @@ public class PolePositionManager : NetworkBehaviour
         }
         else
         {
-            inRankingPlayer.WaitOne();
             m_SetUpPlayer.m_PlayerController.posRanking = posRanking[ordenRanking].transform.position;
             m_SetUpPlayer.CmdUpdateOrdenRanking();
-            inRankingPlayer.ReleaseMutex();
         }
     }
 

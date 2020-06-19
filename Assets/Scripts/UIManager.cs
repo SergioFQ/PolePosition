@@ -113,8 +113,9 @@ public class UIManager : MonoBehaviour
     {
         m_polePositionManager.EndGame();
         Destroy(m_NetworkManager.gameObject);
-        Destroy(chat);
+        //Destroy(chat);
         SceneManager.LoadScene("Game");
+        m_polePositionManager.activateChat();
     }
     private void StartRace()
     {
