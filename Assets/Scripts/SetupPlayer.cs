@@ -183,26 +183,26 @@ public class SetupPlayer : NetworkBehaviour
         {
             case 0:
                 transform.Find("raceCar").Find("body_red").gameObject.SetActive(true);
-                transform.Find("raceCar").Find("body_orange").gameObject.SetActive(false);
                 transform.Find("raceCar").Find("body_white").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_orange").gameObject.SetActive(false);
                 transform.Find("raceCar").Find("body_green").gameObject.SetActive(false);
                 break;
             case 1:
+                transform.Find("raceCar").Find("body_green").gameObject.SetActive(true);
                 transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
                 transform.Find("raceCar").Find("body_orange").gameObject.SetActive(false);
                 transform.Find("raceCar").Find("body_white").gameObject.SetActive(false);
-                transform.Find("raceCar").Find("body_green").gameObject.SetActive(true);
                 break;
             case 2:
-                transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
                 transform.Find("raceCar").Find("body_orange").gameObject.SetActive(true);
-                transform.Find("raceCar").Find("body_white").gameObject.SetActive(false);
                 transform.Find("raceCar").Find("body_green").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_white").gameObject.SetActive(false);
                 break;
             case 3:
-                transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
-                transform.Find("raceCar").Find("body_orange").gameObject.SetActive(false);
                 transform.Find("raceCar").Find("body_white").gameObject.SetActive(true);
+                transform.Find("raceCar").Find("body_orange").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
                 transform.Find("raceCar").Find("body_green").gameObject.SetActive(false);
                 break;
         }

@@ -139,7 +139,7 @@ public class PlayerController : NetworkBehaviour
         }
 
         //Debug volcar y spawnear cuando salimos de la pista
-        if (Input.GetKeyUp(KeyCode.F))
+        if (Input.GetKeyUp(KeyCode.F) && isReady)
         {
             debugUpsideDown = true;
         }
