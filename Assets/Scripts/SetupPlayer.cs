@@ -158,7 +158,7 @@ public class SetupPlayer : NetworkBehaviour
     }
     private void OnDestroy()
     {
-        if (isLocalPlayer)
+        if (isLocalPlayer && !isServer)
         {
             m_UIManager.ActivateServerOutHUD();
 
@@ -279,6 +279,14 @@ public class SetupPlayer : NetworkBehaviour
     {
         if (message.Trim() != "")
             RpcReceive(message.Trim());
+    }
+
+    public void CmdEndServerGame()
+    {
+        if (isServerOnly)
+        {
+            m_PolePositionManager.EndServer();
+        }
     }
 
     [ClientRpc]

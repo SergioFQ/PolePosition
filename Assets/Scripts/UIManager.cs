@@ -67,7 +67,11 @@ public class UIManager : MonoBehaviour
     [Header("Server Disconnected")] [SerializeField] private GameObject serverDisconnected;
     [SerializeField] private Button buttonExitServerOut;
     [SerializeField] private Button buttonMainMenuServerOut;
-    
+
+    [Header("End Server")] [SerializeField] private GameObject gameEnd;
+    [SerializeField] private Button buttonEndExit;
+    [SerializeField] private Button buttonEndRestart;
+
     private void Awake()
     {
         m_NetworkManager = FindObjectOfType<NetworkManager>();
@@ -93,6 +97,8 @@ public class UIManager : MonoBehaviour
         buttonExitServerOut.onClick.AddListener(() => ExitGame());
         buttonMainMenuServerOut.onClick.AddListener(() => RestartGame());
         buttonColorLobby.onClick.AddListener(()=> SelectColorLobby());
+        buttonEndExit.onClick.AddListener(()=> ExitGame());
+        buttonEndRestart.onClick.AddListener(()=>RestartGame());
         ActivateMainMenu();
         textLaps.text = "Lap 0/5";
     }
@@ -172,6 +178,7 @@ public class UIManager : MonoBehaviour
         serverDisconnected.SetActive(false);
         fullGame.SetActive(false);
         abandonmetVictory.SetActive(false);
+        gameEnd.SetActive(false);
     }
 
     private void ActivateInGameHUD()
@@ -263,6 +270,14 @@ public class UIManager : MonoBehaviour
         {
             abandonmetVictory.SetActive(true);
         }
+    }
+
+    public void ActiveEndServer()
+    {
+        serverHUD.SetActive(false);
+        m_polePositionManager.EndGame();
+        gameEnd.SetActive(true);
+
     }
     //cambiamos el color del coche dando click al botón de color las veces que sean necesarias hasta ver que aparece el texto del color deseado. Los colores son (ROJO, VERDE, AMARILLO Y BLANCO)
     private void SelectColor()

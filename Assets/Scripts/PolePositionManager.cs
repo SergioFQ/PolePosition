@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class PolePositionManager : NetworkBehaviour
 {
-    [SyncVar (hook = nameof(numPlayersHook))] public int numPlayers;
+    [SyncVar(hook = nameof(numPlayersHook))] public int numPlayers;
     public NetworkManager networkManager;
     public Vector3[] posSphere; //vector publico que guardaría la posición de las esferas
     public readonly List<PlayerInfo> m_Players = new List<PlayerInfo>(4);
@@ -20,7 +20,7 @@ public class PolePositionManager : NetworkBehaviour
     private float[] arcLengths;
     public GameObject[] checkpoints;
     public GameObject[] posRanking;
-     public GameObject target;
+    public GameObject target;
     [SerializeField] private GameObject cameraRankingPos;
     //private PlayerInfo m_PlayerInfo; 
     public SetupPlayer m_SetUpPlayer;
@@ -39,7 +39,7 @@ public class PolePositionManager : NetworkBehaviour
         if (networkManager == null) networkManager = FindObjectOfType<NetworkManager>();
         if (m_CircuitController == null) m_CircuitController = FindObjectOfType<CircuitController>();
         if (m_chat == null) m_chat = FindObjectOfType<MyChat>();
-        posSphere = new Vector3[4];        
+        posSphere = new Vector3[4];
         m_DebuggingSpheres = new GameObject[networkManager.maxConnections];
         for (int i = 0; i < networkManager.maxConnections; ++i)
         {
@@ -58,12 +58,11 @@ public class PolePositionManager : NetworkBehaviour
         //m_SetUpPlayer = FindObjectOfType<SetupPlayer>();
         //m_PlayerInfo = GetComponent<PlayerInfo>();
     }
-    
+
     private void Update()
     {
-        
-        if (m_Players.Count == 0)
-            return;
+
+        if (m_Players.Count == 0) { return; }
         UpdateRaceProgress();
     }
 
@@ -71,7 +70,7 @@ public class PolePositionManager : NetworkBehaviour
     {
         m_Players.Add(player);
         arcLengths = new float[m_Players.Count];
-        if(m_Players.Count == 4)
+        if (m_Players.Count == 4)
         {
             full = true;
         }
@@ -97,7 +96,7 @@ public class PolePositionManager : NetworkBehaviour
                 return 1;
             }
 
-            if (m_ArcLengths[x.ID] > m_ArcLengths[y.ID] )
+            if (m_ArcLengths[x.ID] > m_ArcLengths[y.ID])
             {
                 if (x.CurrentLap == y.CurrentLap && (x.LastPoint == -1 && y.LastPoint != -1))
                 {
@@ -107,7 +106,8 @@ public class PolePositionManager : NetworkBehaviour
 
                 return -1;
             }
-            else {
+            else
+            {
 
 
                 return 1;
@@ -130,10 +130,12 @@ public class PolePositionManager : NetworkBehaviour
 
     private void CheckEnoughPlayers()
     {
-        if(m_Players.Count == 1)
+        if (m_Players.Count == 1 && started)
         {
             m_Players[0].GetComponent<PlayerController>().setInactiveByAbandonmet();
             RpcVictoryByAbandonment();
+            //started = false;
+            // m_Players[0].GetComponent<SetupPlayer>().CmdEndServerGame();
         }
     }
 
@@ -150,16 +152,16 @@ public class PolePositionManager : NetworkBehaviour
                 ordenP.Add(m_Players[i]);
             }
 
-            for (int i = m_Players.Count - 1 ; i >= 0 ; i--)
+            for (int i = m_Players.Count - 1; i >= 0; i--)
             {
                 if (m_Players[i] == null)
                 {
                     if (isServer)
                     {
-                        
+
                         RemovePlayer(i);
                     }
-                    if (isServerOnly)
+                    if (isServerOnly && (m_Players.Count>0))
                     {
                         RpcDeletePlayer(i);
                     }
@@ -178,9 +180,9 @@ public class PolePositionManager : NetworkBehaviour
             {
                 orden[i] = arcLengths[i];
             }
-            
+
             ordenP.Sort(new PlayerInfoComparer(orden));
-            
+
             myRaceOrder = " ";
             foreach (var _player in ordenP)
             {
@@ -194,15 +196,18 @@ public class PolePositionManager : NetworkBehaviour
     {
         if (isServer)
         {
-            RpcStoppedServer();
-            networkManager.StopHost();
+            if (m_Players.Count > 0)
+            {
+                RpcStoppedServer();
+                networkManager.StopHost();
+            }
         }
         else
         {
             networkManager.StopClient();
         }
     }
-    
+
     public void startRace()
     {
         if (!started)
@@ -216,7 +221,10 @@ public class PolePositionManager : NetworkBehaviour
                 readyPlayer.ReleaseMutex();
                 if (isServerOnly && numPlayers >= m_Players.Count)
                 {
-                    started = true;
+                    //started = true;
+                    //readyPlayer.WaitOne();
+                    //numPlayers = 0;
+                    //readyPlayer.ReleaseMutex();
                 }
             }
             else
@@ -224,6 +232,13 @@ public class PolePositionManager : NetworkBehaviour
                 m_SetUpPlayer.CmdAddNumPlayer();
             }
         }
+    }
+
+    public void EndServer()
+    {
+        //Debug.Log("DEBERIA ACTIVAR EL HUD DE FIN SERVER");
+        m_UIManager.ActiveEndServer();
+        networkManager.StopHost();
     }
 
     public bool CheckSpace()
@@ -243,18 +258,31 @@ public class PolePositionManager : NetworkBehaviour
 
     public void RemovePlayer(int id)
     {
-        
+
         for (int i = id + 1; i < m_Players.Count; i++)
         {
             m_Players[i].ID--;
         }
         m_Players.RemoveAt(id);
         takenPositions(id);
+
+        if (m_Players.Count == 0)
+        {
+            if (isServerOnly)
+            {
+                if (started == true)
+                {
+
+                    EndServer();
+                }
+            }
+        }
+
     }
 
     public void takenPositions(int id)
     {
-        for(int i = 0; i< 4; i++)
+        for (int i = 0; i < 4; i++)
         {
             if (m_MyNetworkManager.positionsIDs[i] > id)
             {
@@ -266,7 +294,7 @@ public class PolePositionManager : NetworkBehaviour
 
     private void numPlayersHook(int old, int newValue)
     {
-        if ((newValue>=m_Players.Count && m_Players.Count>1) && !started)
+        if ((newValue >= m_Players.Count && m_Players.Count > 1) && !started)
         {
             started = true;
             if (m_SetUpPlayer != null)
@@ -289,11 +317,14 @@ public class PolePositionManager : NetworkBehaviour
                 m_SetUpPlayer.m_PlayerController.isReady = true;
                 m_SetUpPlayer.m_PlayerController.StartTime();
             }
-            
+
             m_UIManager.deactivateReadyMenu();
-            
+            readyPlayer.WaitOne();
+            //numPlayers = 0;
+            readyPlayer.ReleaseMutex();
         }
     }
+
 
     //[ClientRpc]
     void ComputeCarArcLength(int ID)
@@ -310,7 +341,7 @@ public class PolePositionManager : NetworkBehaviour
             this.m_CircuitController.ComputeClosestPointArcLength(carPos, out segIdx, out carProj, out carDist);
 
         this.m_DebuggingSpheres[ID].transform.position = carProj;
-        posSphere[ID] = this.m_DebuggingSpheres[ID].transform.position; 
+        posSphere[ID] = this.m_DebuggingSpheres[ID].transform.position;
         if (this.m_Players[ID].CurrentLap == 0)
         {
             minArcL -= m_CircuitController.CircuitLength;
@@ -324,13 +355,13 @@ public class PolePositionManager : NetworkBehaviour
     }
     void SetRaceOrder(string old, string newOrder)
     {
-        
+
         m_UIManager.UpdateNames(newOrder);
     }
 
     public void SetNamesRanking()
     {
-        
+
         if (isServer)
         {
             mutexNamesRanking.WaitOne();
@@ -339,14 +370,14 @@ public class PolePositionManager : NetworkBehaviour
         }
         else
         {
-            
+
             m_SetUpPlayer.CmdUpdateNamesRanking();
         }
     }
 
     public void SetPosInRanking()
     {
-        
+
         if (isServer)
         {
             //Interlocked.Increment(ref ordenRanking);
