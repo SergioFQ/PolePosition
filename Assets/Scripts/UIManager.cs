@@ -259,7 +259,10 @@ public class UIManager : MonoBehaviour
     {
         inGameHUD.SetActive(false);
         readyMenu.SetActive(false);
-        abandonmetVictory.SetActive(true);
+        if (!gameOverMenu.activeSelf)
+        {
+            abandonmetVictory.SetActive(true);
+        }
     }
     //cambiamos el color del coche dando click al botón de color las veces que sean necesarias hasta ver que aparece el texto del color deseado. Los colores son (ROJO, VERDE, AMARILLO Y BLANCO)
     private void SelectColor()
