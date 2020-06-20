@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/* LapManager: clase encargada de controlar cuando el jugador pasa por meta y aumenta su número de vueltas
+ * actuales.
+ */ 
 public class LapManager : MonoBehaviour
 {
     #region Variables
@@ -14,6 +17,9 @@ public class LapManager : MonoBehaviour
 
     #region Unity Callbacks
 
+    /* OnTriggerEnter: detecta si el jugador ha pasado por meta y si ha recorrido completamente el circuito sin
+     * haber hecho trampas (si ha pasado TODOS los checkpoints repartidos por el circuito).
+     */ 
     private void OnTriggerEnter(Collider other)
     {
         if (other.GetComponent<PlayerController>().isLocalPlayer)
