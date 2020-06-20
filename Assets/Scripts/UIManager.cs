@@ -297,6 +297,7 @@ public class UIManager : MonoBehaviour
     {
         m_NetworkManager.StartHost();
         ActivateInGameHUD();
+        buttonLaps.gameObject.SetActive(true);
         playerName = inputFieldName.text;
     }
 
@@ -311,6 +312,7 @@ public class UIManager : MonoBehaviour
         m_NetworkManager.StartClient();
         playerName = inputFieldName.text;
         ActivateInGameHUD();
+        buttonLaps.gameObject.SetActive(false);
     }
 
     /* StartServer: Abrirá un servidor al que podrán unirse los jugadores y activará también un HUD diferente a los demás donde
@@ -460,22 +462,28 @@ public class UIManager : MonoBehaviour
      */
     void SetLapsServer()
     {
-        laps = (laps + 1) % 3;
-        switch (laps)
+        if (m_polePositionManager.started)
         {
-            case 0:
-                buttonLapsSer.GetComponentInChildren<Text>().text = "LAPS: 3";
-                break;
-            case 1:
-                buttonLapsSer.GetComponentInChildren<Text>().text = "LAPS: 4";
-                break;
-            case 2:
-                buttonLapsSer.GetComponentInChildren<Text>().text = "LAPS: 5";
-                break;
-
+            buttonLapsSer.onClick.RemoveAllListeners();
         }
-        m_polePositionManager.SetNumLaps(laps);
+        else
+        {
+            laps = (laps + 1) % 3;
+            switch (laps)
+            {
+                case 0:
+                    buttonLapsSer.GetComponentInChildren<Text>().text = "LAPS: 3";
+                    break;
+                case 1:
+                    buttonLapsSer.GetComponentInChildren<Text>().text = "LAPS: 4";
+                    break;
+                case 2:
+                    buttonLapsSer.GetComponentInChildren<Text>().text = "LAPS: 5";
+                    break;
 
+            }
+            m_polePositionManager.SetNumLaps(laps);
+        }
     }
 
     #endregion

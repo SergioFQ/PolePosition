@@ -136,6 +136,10 @@ public class PlayerController : NetworkBehaviour
             {
                 m_PlayerInfo.LastPoint = id;
             }
+            if (id == 0 && m_PlayerInfo.CurrentLap == -1)
+            {
+                m_CurrentLap = 0;
+            }
             if (id <= m_PlayerInfo.LastPoint - 1)
             {
                 if (isLocalPlayer)
@@ -150,6 +154,7 @@ public class PlayerController : NetworkBehaviour
             {
                 CrashSpawn();
             }
+            
         }
     }
 
