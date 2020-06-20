@@ -60,6 +60,7 @@ public class PolePositionManager : NetworkBehaviour
         {
             m_DebuggingSpheres[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             m_DebuggingSpheres[i].GetComponent<SphereCollider>().enabled = false;
+            m_DebuggingSpheres[i].GetComponent<MeshRenderer>().enabled = false;
         }
         m_UIManager = FindObjectOfType<UIManager>();
         m_UIManager.m_polePositionManager = this; //de esta forma sabemos la relacion de cada poleposition con ui manager de cada player
