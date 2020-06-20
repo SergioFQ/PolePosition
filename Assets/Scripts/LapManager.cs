@@ -20,7 +20,7 @@ public class LapManager : MonoBehaviour
             if (other.GetComponent<PlayerInfo>().LastPoint == 12)
             {
                 other.GetComponent<PlayerInfo>().LastPoint = -1;
-                if (other.GetComponent<PlayerInfo>().CurrentLap == 1)
+                if (other.GetComponent<PlayerInfo>().CurrentLap == (other.GetComponent<PlayerController>().numVueltas - 1))
                 {
                     other.GetComponent<SetupPlayer>().UnfocusCamera(posCamera.transform.position, targetCamera.transform.position);
                     other.GetComponent<PlayerController>().m_UIManager.ActivateGameOver();

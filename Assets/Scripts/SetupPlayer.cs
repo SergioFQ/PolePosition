@@ -37,6 +37,7 @@ public class SetupPlayer : NetworkBehaviour
         {
             if (!m_PolePositionManager.started && !m_PolePositionManager.full)
             {
+                //m_PolePositionManager.SetNumLaps(m_PlayerController.numVueltas - 3);
                 m_PolePositionManager.AddPlayer(m_PlayerInfo);
             }
             m_ID = connectionToClient.connectionId - 1;
@@ -44,6 +45,7 @@ public class SetupPlayer : NetworkBehaviour
         else
         {
             m_ID = connectionToClient.connectionId;
+            m_UIManager.buttonLaps.gameObject.SetActive(true);
         }
         
         
@@ -86,7 +88,13 @@ public class SetupPlayer : NetworkBehaviour
             {
                 m_UIManager.ActivateFullGameHUD();
                 m_NetworkManager.StopClient();
+                if (!isServer)
+                {
+                    m_UIManager.buttonLaps.gameObject.SetActive(false);
+                    
+                }
 
+                
             }
         }
         
@@ -106,6 +114,7 @@ public class SetupPlayer : NetworkBehaviour
             CmdSelectName((m_UIManager.playerName == "") ? ("Player" + (/*m_PolePositionManager.m_Players.Count - 1*/ m_ID )) : (m_UIManager.playerName));
             CmdSelectColor(m_UIManager.colorNumber);
             CmdSelectIdLap(m_PlayerInfo.ID);
+            m_PlayerController.CmdSetNumLaps();
             m_PlayerInfo.IsReady = false;
 
         }
@@ -209,6 +218,9 @@ public class SetupPlayer : NetworkBehaviour
                 break;
         }
     }
+
+
+    
 
     [Command]
     void CmdSelectName(string name)

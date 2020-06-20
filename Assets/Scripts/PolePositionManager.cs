@@ -33,6 +33,7 @@ public class PolePositionManager : NetworkBehaviour
     [SyncVar] public bool full = false;
     private MyNetworkManager m_MyNetworkManager;
     private MyChat m_chat;
+    [SyncVar] public int numVueltas;
 
     private void Awake()
     {
@@ -55,6 +56,14 @@ public class PolePositionManager : NetworkBehaviour
             full = false;
         }
         m_MyNetworkManager = FindObjectOfType<MyNetworkManager>();
+        //if (isServer)
+        //{
+            numVueltas = 3;
+            print(numVueltas + " en el servidor");
+            //RpcSetNumLaps(numVueltas);
+            m_UIManager.InitLaps();
+        //}
+
         //m_SetUpPlayer = FindObjectOfType<SetupPlayer>();
         //m_PlayerInfo = GetComponent<PlayerInfo>();
     }
@@ -161,10 +170,10 @@ public class PolePositionManager : NetworkBehaviour
 
                         RemovePlayer(i);
                     }
-                    if (isServerOnly && (m_Players.Count>0))
+                    /*if (isServerOnly && (m_Players.Count>0))
                     {
                         RpcDeletePlayer(i);
-                    }
+                    }*/
                     full = false;
                     CheckEnoughPlayers();
                 }
@@ -256,6 +265,15 @@ public class PolePositionManager : NetworkBehaviour
         m_Players.RemoveAt(id);
     }
 
+    [ClientRpc]
+    private void RpcSetNumLaps(int laps)
+    {
+        m_SetUpPlayer.m_PlayerController.numVueltas = laps;
+        numVueltas = laps;
+        m_UIManager.textLaps.text = "Lap 0/" + laps;
+    }
+
+
     public void RemovePlayer(int id)
     {
 
@@ -265,7 +283,10 @@ public class PolePositionManager : NetworkBehaviour
         }
         m_Players.RemoveAt(id);
         takenPositions(id);
-
+        if(m_Players.Count > 0)
+        {
+            RpcDeletePlayer(id);
+        }
         if (m_Players.Count == 0)
         {
             if (isServerOnly)
@@ -294,9 +315,10 @@ public class PolePositionManager : NetworkBehaviour
 
     private void numPlayersHook(int old, int newValue)
     {
+        print(newValue + " " + m_Players.Count + " " + started);
         if ((newValue >= m_Players.Count && m_Players.Count > 1) && !started)
         {
-            started = true;
+            //started = true;
             if (m_SetUpPlayer != null)
             {
                 m_SetUpPlayer.CmdStarted();
@@ -405,4 +427,19 @@ public class PolePositionManager : NetworkBehaviour
     {
         m_Started = newStart;
     }*/
+    public void SetNumLaps(int laps)
+    {
+        laps += 3;
+        numVueltas = laps;
+        if (!isServerOnly)
+        {
+            m_SetUpPlayer.m_PlayerController.numVueltas = laps;
+        }
+        if (isServer)
+        {
+            print(laps + " al cambiar su valor");
+            RpcSetNumLaps(laps);
+        }
+    }
+
 }

@@ -40,12 +40,14 @@ public class PlayerController : NetworkBehaviour
     private bool debugUpsideDown = false;
     public bool isReady = false;//variable que se usará para activar todos los coches a la vez
     public Vector3 posRanking;
-    private Stopwatch[] LapTime = new Stopwatch[2];
+    //private Stopwatch[] LapTime = new Stopwatch[2];
+    private Stopwatch[] LapTime;
     private Stopwatch totalTime = new Stopwatch();
     private TimeSpan timeSpan = new TimeSpan();
     [SyncVar(hook = nameof(FinalTotalTimeToString))] public string finalTotalTime = "";
     [SyncVar(hook = nameof(FinalBestLapTimeToString))] public string bestLapTime = "";
     Mutex mutexTimes = new Mutex();
+    public int numVueltas;
 
     private float Speed
     {
@@ -115,9 +117,11 @@ public class PlayerController : NetworkBehaviour
         m_CurrentLap = -1;
         frictionCurve = axleInfos[0].leftWheel.sidewaysFriction;
         frictionCurve.extremumSlip = 0.3f;
-        for (int i = 0; i < 2; i++)
+        LapTime = new Stopwatch[5];
+        for (int i = 0; i < 5; i++)
             LapTime[i] = new Stopwatch();
         //pos = transform.position;
+        numVueltas = m_PolePositionManager.numVueltas;
     }
 
 
@@ -129,7 +133,7 @@ public class PlayerController : NetworkBehaviour
         InputBrake = Input.GetAxis("Jump");
         Speed = m_Rigidbody.velocity.magnitude;
         TotalTimeDel = totalTime;
-        if (m_CurrentLap < LapTime.Length && m_CurrentLap!=-1)
+        if (m_CurrentLap < numVueltas/*LapTime.Length*/ && m_CurrentLap!=-1)
         {
             LapTimeDel = LapTime[m_CurrentLap];
         }
@@ -390,7 +394,7 @@ public class PlayerController : NetworkBehaviour
         if (newLap > 0)
         {
             LapTime[newLap - 1].Stop();
-            if (!(newLap >= LapTime.Length))
+            if (!(newLap >= numVueltas/*LapTime.Length*/))
             {
                 LapTime[newLap] = new Stopwatch();
                 LapTime[newLap].Start();
@@ -407,7 +411,7 @@ public class PlayerController : NetworkBehaviour
     public void setInactiveByAbandonmet()
     {
         totalTime.Stop();
-        if(m_CurrentLap != -1 && m_CurrentLap < 2)
+        if(m_CurrentLap != -1 && m_CurrentLap < numVueltas /*2*/)
         {
             LapTime[m_CurrentLap].Stop();
         }
@@ -427,11 +431,11 @@ public class PlayerController : NetworkBehaviour
         if (isLocalPlayer)
         {
             Stopwatch aux = LapTime[0];
-            foreach (var lap in LapTime)
+            for(int i = 0; i < numVueltas; i ++)
             {
-                if (lap.Elapsed.TotalMilliseconds < aux.Elapsed.TotalMilliseconds)
+                if (LapTime[i].Elapsed.TotalMilliseconds < aux.Elapsed.TotalMilliseconds)
                 {
-                    aux = lap;
+                    aux = LapTime[i];
                 }
             }
             m_PlayerInfo.FinalTime = (TimeToString(totalTime));
@@ -507,6 +511,20 @@ public class PlayerController : NetworkBehaviour
         
     }
 
+    [Command]
+    public void CmdSetNumLaps()
+    {
+        RpcSetNumLaps(numVueltas);
+        print(" NumVueltas en el command " + numVueltas);
+    }
+
+    [ClientRpc]
+    private void RpcSetNumLaps(int laps)
+    {
+        numVueltas = laps;
+        m_UIManager.textLaps.text = "0/" + laps;
+    }
+
     public void StartTime()
     {
         totalTime = new Stopwatch();
@@ -547,5 +565,6 @@ public class PlayerController : NetworkBehaviour
     }
 
     
+
     #endregion
 }
