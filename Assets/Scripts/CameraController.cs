@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/* CameraController: clase que se encarga de establecer las especificaciones de la cámara que verá el jugador durante la pratida
+ */
+
 public class CameraController : MonoBehaviour
 {
     #region Variables
