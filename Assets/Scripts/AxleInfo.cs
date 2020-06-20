@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/* AxleInfo: clase que guarda variables que serán usadas para el moviemiento de
+ * las ruedas del vehiculo.
+ */ 
 [System.Serializable]
 public class AxleInfo
 {

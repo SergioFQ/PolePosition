@@ -1,7 +1,9 @@
 ﻿using Mirror;
 using UnityEngine;
 
-
+/* MyNetworkManager: clase que hereda de NetworkManager para hacer Override del método que se
+ * encarga de hacer aparecer a los jugadores en escena.
+ */ 
 [AddComponentMenu("")]
 public class MyNetworkManager : NetworkManager
 {
@@ -22,9 +24,14 @@ public class MyNetworkManager : NetworkManager
 
     #region Methods
 
+    /* OnServerAddPlayer: metodo override de Network Manager para cambiar 
+     * la forma en la que los players aparecen en escena, evitando asi que en algún
+     * momento pueda aparecer uno encima de otro. Con este método controlamos qué
+     * posición inicial está libre y ponemos al nuevo player en dicha posición.
+     */
     public override void OnServerAddPlayer(NetworkConnection conn)
     {
-        int pos = firstPosAvailable();
+        int pos = FirstPosAvailable();
         Transform startPos = startingPoints[pos].transform;
         GameObject player = startPos != null
             ? Instantiate(playerPrefab, startPos.position, startPos.rotation)
@@ -34,7 +41,11 @@ public class MyNetworkManager : NetworkManager
         NetworkServer.AddPlayerForConnection(conn, player);
     }
 
-    public int firstPosAvailable()
+    /* FirstPosAvailable: método que recorre el array de posiciones iniciales 
+     * para conocer la primera posición libre en la que puede aparecer el nuevo
+     * jugador.
+     */
+    public int FirstPosAvailable()
     {
 
         for (int i = 0; i < takenPositions.Length; i++)
@@ -55,7 +66,7 @@ public class MyNetworkManager : NetworkManager
                 return i;
             }
         }
-        return -1; // Returneamos -1 porque ya comprobamos que esté llena la partida por tanto no va a llegar a pasar
+        return -1; // Return -1 porque ya comprobamos en otra clase que esté llena la partida por tanto no va a llegar a pasar
     }
 
     #endregion

@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/* CircuitController: clase encargada de hacer todos los calculas de la posición de los jugadores en relación con una
+ * línea que recorre todo el circuito para poder conocer el orden de la carrera.
+ */ 
 public class CircuitController : MonoBehaviour
 {
     #region Variables
