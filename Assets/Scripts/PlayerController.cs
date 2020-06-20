@@ -564,7 +564,7 @@ public class PlayerController : NetworkBehaviour
     private void RpcSetNumLaps(int laps)
     {
         numVueltas = laps;
-        m_UIManager.textLaps.text = "0/" + laps;
+        m_UIManager.textLaps.text = "Lap 0/" + laps;
     }
 
     #endregion Commands & ClientRPCs
