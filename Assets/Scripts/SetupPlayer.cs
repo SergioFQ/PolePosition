@@ -10,18 +10,32 @@ using System.Diagnostics;
 	API Reference: https://mirror-networking.com/docs/api/Mirror.NetworkBehaviour.html
 */
 
+/** SETUPLAYER CLASS
+ * Esta clase se encarga de añadir cada nuevo jugador a la partida, controlando cada nueva conexión.
+ * Desde el lado del cliente (host incluído) se genera un jugador, para ello se introduce la información adecuada a su playerInfo.
+ * Desde el lado del servidor se añade también a su propia lista de jugadores.
+ * Esta clase contiene también los commands encargados de pasar la información de playerInfo al servidor desde el cliente.
+ * */
 public class SetupPlayer : NetworkBehaviour
 {
-    [SyncVar] private int m_ID;
+    #region Variables
+    // Variables SyncVar
     [SyncVar (hook = nameof(setName))] private string m_Name;
     [SyncVar (hook = nameof(setColour))] private int m_Colour;
-    private UIManager m_UIManager;
-    private NetworkManager m_NetworkManager;
+    [SyncVar] private int m_ID;
+
+    // Referencias a scripts
+    // Variable públicas
     public PlayerController m_PlayerController;
     public PlayerInfo m_PlayerInfo;
     public PolePositionManager m_PolePositionManager;
     public MyNetworkManager m_MyNetworkManager;
-    private MyChat m_chat;
+
+    // Variables privadas
+    private UIManager m_UIManager;
+    private NetworkManager m_NetworkManager;
+
+    #endregion
 
     #region Start & Stop Callbacks
 
@@ -30,6 +44,7 @@ public class SetupPlayer : NetworkBehaviour
     /// <para>This could be triggered by NetworkServer.Listen() for objects in the scene, or by NetworkServer.Spawn() for objects that are dynamically created.</para>
     /// <para>This will be called for objects on a "host" as well as for object on a dedicated server.</para>
     /// </summary>
+    /// Este método proviene de 
     public override void OnStartServer()
     {
         base.OnStartServer();
@@ -37,7 +52,6 @@ public class SetupPlayer : NetworkBehaviour
         {
             if (!m_PolePositionManager.started && !m_PolePositionManager.full)
             {
-                //m_PolePositionManager.SetNumLaps(m_PlayerController.numVueltas - 3);
                 m_PolePositionManager.AddPlayer(m_PlayerInfo);
             }
             m_ID = connectionToClient.connectionId - 1;
@@ -47,20 +61,6 @@ public class SetupPlayer : NetworkBehaviour
             m_ID = connectionToClient.connectionId;
             m_UIManager.buttonLaps.gameObject.SetActive(true);
         }
-        
-        
-        
-        /*if (!m_PolePositionManager.CheckSpace())
-        {
-            if (isServerOnly)
-            {
-                m_PolePositionManager.AddPlayer(m_PlayerInfo);
-            }
-            else
-            {
-                m_ID = connectionToClient.connectionId;
-            }
-        }*/
     }
 
    
@@ -77,7 +77,6 @@ public class SetupPlayer : NetworkBehaviour
         m_PlayerInfo.CurrentLap = -1;
         m_PlayerInfo.LastPoint = -1;
         print("Started " + m_PolePositionManager.started);
-        //if (m_chat == null) m_chat = FindObjectOfType<MyChat>();
         if (!m_PolePositionManager.started && !m_PolePositionManager.full)
         {
             m_PolePositionManager.AddPlayer(m_PlayerInfo);
@@ -111,7 +110,7 @@ public class SetupPlayer : NetworkBehaviour
         m_PolePositionManager.m_SetUpPlayer = this;
         if (!m_PolePositionManager.started)
         {
-            CmdSelectName((m_UIManager.playerName == "") ? ("Player" + (/*m_PolePositionManager.m_Players.Count - 1*/ m_ID )) : (m_UIManager.playerName));
+            CmdSelectName((m_UIManager.playerName == "") ? ("Player" + (m_ID )) : (m_UIManager.playerName));
             CmdSelectColor(m_UIManager.colorNumber);
             CmdSelectIdLap(m_PlayerInfo.ID);
             m_PlayerController.CmdSetNumLaps();
@@ -122,6 +121,7 @@ public class SetupPlayer : NetworkBehaviour
 
     #endregion
 
+    #region Unity Callbacks
     private void Awake()
     {
         print("Awake");
@@ -134,7 +134,6 @@ public class SetupPlayer : NetworkBehaviour
         m_MyNetworkManager.m_SetUpPlayer = this;
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         if (isLocalPlayer)
@@ -147,6 +146,32 @@ public class SetupPlayer : NetworkBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        if (isLocalPlayer && !isServer)
+        {
+            m_UIManager.ActivateServerOutHUD();
+
+        }
+    }
+
+    #endregion
+
+    #region Methods
+    void ConfigureCamera()
+    {
+        if (Camera.main != null) Camera.main.gameObject.GetComponent<CameraController>().m_Focus = this.gameObject;
+    }
+
+    public void UnfocusCamera(Vector3 cameraPos, Vector3 targetPos)
+    {
+        Camera.main.gameObject.GetComponent<CameraController>().m_Focus = null;
+        Camera.main.gameObject.transform.position = cameraPos;
+        Camera.main.gameObject.transform.LookAt(targetPos);
+    }
+    #endregion
+
+    #region Events Handler
     void OnSpeedChangeEventHandler(float speed)
     {
         m_UIManager.UpdateSpeed((int) speed * 5); // 5 for visualization purpose (km/h)
@@ -161,67 +186,9 @@ public class SetupPlayer : NetworkBehaviour
         m_UIManager.UpdateLapTime(m_PlayerController.TimeToString(lt));
     }
 
-    void ConfigureCamera()
-    {
-        if (Camera.main != null) Camera.main.gameObject.GetComponent<CameraController>().m_Focus = this.gameObject;
-    }
-    private void OnDestroy()
-    {
-        if (isLocalPlayer && !isServer)
-        {
-            m_UIManager.ActivateServerOutHUD();
+    #endregion
 
-        }
-    }
-    public void UnfocusCamera(Vector3 cameraPos, Vector3 targetPos)
-    {
-        Camera.main.gameObject.GetComponent<CameraController>().m_Focus = null;
-        Camera.main.gameObject.transform.position = cameraPos;
-        Camera.main.gameObject.transform.LookAt(targetPos);
-    }
-    void setName(string old, string newName)
-    {
-        m_PlayerInfo.Name = newName;
-    }
-    
-
-
-    void setColour(int old, int newColour)
-    {
-        m_PlayerInfo.ColourID = newColour;
-
-        switch (newColour)
-        {
-            case 0:
-                transform.Find("raceCar").Find("body_red").gameObject.SetActive(true);
-                transform.Find("raceCar").Find("body_white").gameObject.SetActive(false);
-                transform.Find("raceCar").Find("body_orange").gameObject.SetActive(false);
-                transform.Find("raceCar").Find("body_green").gameObject.SetActive(false);
-                break;
-            case 1:
-                transform.Find("raceCar").Find("body_green").gameObject.SetActive(true);
-                transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
-                transform.Find("raceCar").Find("body_orange").gameObject.SetActive(false);
-                transform.Find("raceCar").Find("body_white").gameObject.SetActive(false);
-                break;
-            case 2:
-                transform.Find("raceCar").Find("body_orange").gameObject.SetActive(true);
-                transform.Find("raceCar").Find("body_green").gameObject.SetActive(false);
-                transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
-                transform.Find("raceCar").Find("body_white").gameObject.SetActive(false);
-                break;
-            case 3:
-                transform.Find("raceCar").Find("body_white").gameObject.SetActive(true);
-                transform.Find("raceCar").Find("body_orange").gameObject.SetActive(false);
-                transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
-                transform.Find("raceCar").Find("body_green").gameObject.SetActive(false);
-                break;
-        }
-    }
-
-
-    
-
+    #region Commands & ClientRPCs
     [Command]
     void CmdSelectName(string name)
     {
@@ -238,9 +205,7 @@ public class SetupPlayer : NetworkBehaviour
     {
         if (isServerOnly)
         {
-            //m_PolePositionManager.m_Players[m_s].ColourID = colour;
-            //m_PlayerInfo.ColourID = colour;
-            setColour(0,colour);
+            setColour(0, colour);
         }
         m_Colour = colour;
     }
@@ -293,17 +258,51 @@ public class SetupPlayer : NetworkBehaviour
             RpcReceive(message.Trim());
     }
 
-    public void CmdEndServerGame()
-    {
-        if (isServerOnly)
-        {
-            m_PolePositionManager.EndServer();
-        }
-    }
 
     [ClientRpc]
     public void RpcReceive(string message)
     {
         OnMessage?.Invoke(this, message);
     }
+    #endregion
+
+    #region Hooks
+    void setName(string old, string newName)
+    {
+        m_PlayerInfo.Name = newName;
+    }
+
+    void setColour(int old, int newColour)
+    {
+        m_PlayerInfo.ColourID = newColour;
+
+        switch (newColour)
+        {
+            case 0:
+                transform.Find("raceCar").Find("body_red").gameObject.SetActive(true);
+                transform.Find("raceCar").Find("body_white").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_orange").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_green").gameObject.SetActive(false);
+                break;
+            case 1:
+                transform.Find("raceCar").Find("body_green").gameObject.SetActive(true);
+                transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_orange").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_white").gameObject.SetActive(false);
+                break;
+            case 2:
+                transform.Find("raceCar").Find("body_orange").gameObject.SetActive(true);
+                transform.Find("raceCar").Find("body_green").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_white").gameObject.SetActive(false);
+                break;
+            case 3:
+                transform.Find("raceCar").Find("body_white").gameObject.SetActive(true);
+                transform.Find("raceCar").Find("body_orange").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_red").gameObject.SetActive(false);
+                transform.Find("raceCar").Find("body_green").gameObject.SetActive(false);
+                break;
+        }
+    }
+    #endregion
 }

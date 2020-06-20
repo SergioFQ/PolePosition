@@ -4,26 +4,30 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    #region Variables
+
+    // Variables privadas
+    private Vector3 m_Direction = Vector3.zero;
+    private Vector3 pathDir;
+    private Camera mainCamera;
+
+    // Variables SerializeField
     [SerializeField] public GameObject m_Focus;
-
     [SerializeField] public Vector3 m_offset = new Vector3(10, 10, 10);
-
     [SerializeField] public CircuitController m_Circuit;
     [SerializeField] private float m_Distance = 10;
     [SerializeField] private float m_Elevation = 8;
     [Range(0, 1)] [SerializeField] private float m_Following = 0.5f;
 
-    private Vector3 m_Direction = Vector3.zero;
-    private Vector3 pathDir;
-    private Camera mainCamera;
+    #endregion
 
-    // Start is called before the first frame update
+    #region Unity Callbacks
+
     void Start()
     {
         mainCamera = this.GetComponent<Camera>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (m_Focus != null)
@@ -60,4 +64,7 @@ public class CameraController : MonoBehaviour
             }
         }
     }
+
+    #endregion
+
 }

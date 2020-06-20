@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 
+/// <summary>
+///  Clase que pertenece a cada player almacenando su información
+/// </summary>
 public class PlayerInfo : MonoBehaviour
 {
     public string Name { get; set; }

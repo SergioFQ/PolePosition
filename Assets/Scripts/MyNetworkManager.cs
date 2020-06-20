@@ -5,33 +5,27 @@ using UnityEngine;
 [AddComponentMenu("")]
 public class MyNetworkManager : NetworkManager
 {
-    /*public string PlayerName { get; set; }
+    #region Variables
 
-
-    public class CreatePlayerMessage : MessageBase
-    {
-        public string name;
-    }
-
-    public override void OnClientConnect(NetworkConnection conn)
-    {
-        base.OnClientConnect(conn);
-
-        // tell the server to create a player with this name
-        conn.Send(new CreatePlayerMessage { name = PlayerName });
-    }
-
-    */
+    // Variables públicas
     public SetupPlayer m_SetUpPlayer;
-    [SerializeField] private GameObject[] startingPoints;
     public int[] positionsIDs = new int[4];
+
+    // Variables privadas
     private bool[] takenPositions = new bool[4];
+
+    // Variables SerializeField
+    [SerializeField] private GameObject[] startingPoints;
+
+
+    #endregion
+
+    #region Methods
 
     public override void OnServerAddPlayer(NetworkConnection conn)
     {
-        //base.OnServerAddPlayer(conn);
         int pos = firstPosAvailable();
-        Transform startPos = startingPoints[pos].transform; //GetStartPosition();
+        Transform startPos = startingPoints[pos].transform;
         GameObject player = startPos != null
             ? Instantiate(playerPrefab, startPos.position, startPos.rotation)
             : Instantiate(playerPrefab);
@@ -39,6 +33,7 @@ public class MyNetworkManager : NetworkManager
         positionsIDs[pos] = m_SetUpPlayer.m_PlayerInfo.ID;
         NetworkServer.AddPlayerForConnection(conn, player);
     }
+
     public int firstPosAvailable()
     {
 
@@ -63,6 +58,7 @@ public class MyNetworkManager : NetworkManager
         return -1; // Returneamos -1 porque ya comprobamos que esté llena la partida por tanto no va a llegar a pasar
     }
 
+    #endregion
 
 }
 

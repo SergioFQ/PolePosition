@@ -8,15 +8,19 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
+    #region Variables
+    // Variables privadas
+    private NetworkManager m_NetworkManager;
+    private int laps = 3;
+
+    // Variables públicas
     public bool showGUI = true;
     public PolePositionManager m_polePositionManager;
-    private NetworkManager m_NetworkManager;
-
     public int colorNumber = 0;
     public string playerName = "";
     public bool ready = false;
-    private int laps = 3;
 
+    // Variables SerializeField
     [Header("Main Menu")] [SerializeField] private GameObject mainMenu;
     [SerializeField] private Button buttonHost;
     [SerializeField] private Button buttonClient;
@@ -28,9 +32,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Text textColorButton;
 
     [Header("In-Game HUD")]
-    [SerializeField]
-    private GameObject inGameHUD;
-
+    [SerializeField] private GameObject inGameHUD;
     [SerializeField] private Text textSpeed;
     [SerializeField] public Text textLaps;
     [SerializeField] private Text textPosition;
@@ -73,6 +75,9 @@ public class UIManager : MonoBehaviour
     [Header("End Server")] [SerializeField] private GameObject gameEnd;
     [SerializeField] private Button buttonEndExit;
     [SerializeField] private Button buttonEndRestart;
+    #endregion
+
+    #region Unity Callbacks
 
     private void Awake()
     {
@@ -90,7 +95,7 @@ public class UIManager : MonoBehaviour
         buttonInGameMainMenu.onClick.AddListener(() => RestartGame());
         buttonQuitGame.onClick.AddListener(() => ExitGame());
         buttonMainMenuQuit.onClick.AddListener(() => ExitGameMainMenu());
-        buttonExitServer.onClick.AddListener(()=>ExitGame());
+        buttonExitServer.onClick.AddListener(() => ExitGame());
         buttonMainMenuServer.onClick.AddListener(() => RestartGame());
         buttonExitAbandonment.onClick.AddListener(() => ExitGame());
         buttonMainMenuAbandonment.onClick.AddListener(() => RestartGame());
@@ -98,15 +103,18 @@ public class UIManager : MonoBehaviour
         buttonMainMenuFullGame.onClick.AddListener(() => RestartGame());
         buttonExitServerOut.onClick.AddListener(() => ExitGame());
         buttonMainMenuServerOut.onClick.AddListener(() => RestartGame());
-        buttonColorLobby.onClick.AddListener(()=> SelectColorLobby());
-        buttonEndExit.onClick.AddListener(()=> ExitGame());
-        buttonEndRestart.onClick.AddListener(()=>RestartGame());
+        buttonColorLobby.onClick.AddListener(() => SelectColorLobby());
+        buttonEndExit.onClick.AddListener(() => ExitGame());
+        buttonEndRestart.onClick.AddListener(() => RestartGame());
         buttonLaps.onClick.AddListener(() => SetLaps());
         buttonLapsSer.onClick.AddListener(() => SetLapsServer());
         ActivateMainMenu();
 
     }
 
+    #endregion
+
+    #region Methods
     public void ExitGame()
     {
         m_polePositionManager.EndGame();
@@ -123,9 +131,7 @@ public class UIManager : MonoBehaviour
     {
         m_polePositionManager.EndGame();
         Destroy(m_NetworkManager.gameObject);
-        //Destroy(chat);
         SceneManager.LoadScene("Game");
-        //m_polePositionManager.activateChat();
     }
     private void StartRace()
     {
@@ -168,7 +174,7 @@ public class UIManager : MonoBehaviour
     {
         textLapTime.text = "Current lap: " + name;
     }
-    public void SetWrongWay (bool state)
+    public void SetWrongWay(bool state)
     {
         wrongWay.gameObject.SetActive(state);
     }
@@ -190,15 +196,6 @@ public class UIManager : MonoBehaviour
         mainMenu.SetActive(false);
         inGameHUD.SetActive(true);
         readyMenu.SetActive(true);
-        /*if (m_polePositionManager.m_SetUpPlayer.isServer)
-        {
-            buttonLaps.gameObject.SetActive(true);
-        }
-        else
-        {
-            buttonLaps.interactable = false;
-            buttonLaps.gameObject.SetActive(false);
-        }*/
     }
 
     public void ActivateGameOver()
@@ -238,25 +235,11 @@ public class UIManager : MonoBehaviour
 
     private void StartClient()
     {
-
         buttonClient.onClick.RemoveAllListeners();
         m_NetworkManager.networkAddress = (inputFieldIP.text != "") ? inputFieldIP.text : "localhost";
         m_NetworkManager.StartClient();
         playerName = inputFieldName.text;
         ActivateInGameHUD();
-
-
-        /*if (m_polePositionManager.CheckSpace())
-        {
-            Debug.Log("Lo siento mi ciela, dele pa fuera");
-            mainMenu.SetActive(false);
-        }
-        else
-        {
-            playerName = inputFieldName.text;
-            ActivateInGameHUD();
-        }*/
-
     }
 
     private void StartServer()
@@ -294,7 +277,7 @@ public class UIManager : MonoBehaviour
     }
     //cambiamos el color del coche dando click al botón de color las veces que sean necesarias hasta ver que aparece el texto del color deseado. Los colores son (ROJO, VERDE, AMARILLO Y BLANCO)
     private void SelectColor()
-    {        
+    {
         colorNumber = (colorNumber + 1) % 4;
         switch (colorNumber)
         {
@@ -315,8 +298,8 @@ public class UIManager : MonoBehaviour
     }
 
     private void SelectColorLobby()
-    {       
-        colorNumber = (colorNumber+1)%4;
+    {
+        colorNumber = (colorNumber + 1) % 4;
         switch (colorNumber)
         {
             case 0:
@@ -332,16 +315,14 @@ public class UIManager : MonoBehaviour
                 textColorButtonLobby.text = "COLOR: WHITE";
                 break;
         }
-            m_polePositionManager.m_SetUpPlayer.CmdSelectColor(colorNumber);
-        
+        m_polePositionManager.m_SetUpPlayer.CmdSelectColor(colorNumber);
+
     }
 
     public void InitLaps()
     {
         buttonLaps.GetComponentInChildren<Text>().text = "LAPS: 3";
-        //m_polePositionManager.m_SetUpPlayer.m_PlayerController.numVueltas = 3;
         textLaps.text = "Lap 0/" + m_polePositionManager.numVueltas;
-        //m_polePositionManager.SetNumLaps(laps);
     }
 
     void SetLaps()
@@ -392,4 +373,7 @@ public class UIManager : MonoBehaviour
         m_polePositionManager.SetNumLaps(laps);
 
     }
+
+    #endregion
+
 }

@@ -6,14 +6,30 @@ using UnityEngine.UI;
 
 public class MyChat : MonoBehaviour
 {
+    #region Variables
+
+    // Variables públicas
     public InputField chatMessage;
     public Text chatHistory;
     public Scrollbar scrollbar;
+
+    #endregion
+
+    #region Unity Callbacks
 
     public void Awake()
     {
         SetupPlayer.OnMessage += OnPlayerMessage;
     }
+
+    public void OnDestroy()
+    {
+        SetupPlayer.OnMessage -= OnPlayerMessage;
+    }
+
+    #endregion
+
+    #region Methods
 
     private void OnPlayerMessage(SetupPlayer player, string message)
     {
@@ -25,22 +41,15 @@ public class MyChat : MonoBehaviour
         Debug.Log(message);
     }
 
-    public void OnDestroy()
-    {
-        SetupPlayer.OnMessage -= OnPlayerMessage;
-    }
 
     public void OnSend()
     {
         if (chatMessage.text.Trim() == "")
             return;
 
-        // get our player
         SetupPlayer player = NetworkClient.connection.identity.GetComponent<SetupPlayer>();
 
-        // send a message
         player.CmdSend(chatMessage.text.Trim());
-
         chatMessage.text = "";
     }
 
@@ -54,12 +63,13 @@ public class MyChat : MonoBehaviour
     {
         chatHistory.text += message + "\n";
 
-        // it takes 2 frames for the UI to update ?!?!
         yield return null;
         yield return null;
 
-        // slam the scrollbar down
         scrollbar.value = 0;
     }
+
+    #endregion
+
 }
 
