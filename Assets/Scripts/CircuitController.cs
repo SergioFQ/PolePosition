@@ -5,18 +5,22 @@ using UnityEngine;
 public class CircuitController : MonoBehaviour
 {
     #region Variables
+
     //Private
     private LineRenderer m_CircuitPath;
     private Vector3[] m_PathPos;
     private float[] m_CumArcLength;
     private float m_TotalLength;
+
     #endregion Variables
 
     #region Getter
+
     public float CircuitLength
     {
         get { return m_TotalLength; }
     }
+
     #endregion Getter
 
     #region Unity Callback

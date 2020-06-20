@@ -5,9 +5,11 @@ using UnityEngine;
 public class LapManager : MonoBehaviour
 {
     #region Variables
-    //SerializeField
+
+    // SerializeField
     [SerializeField] private GameObject posCamera;
     [SerializeField] private GameObject targetCamera;
+
     #endregion Variables
 
     #region Unity Callbacks

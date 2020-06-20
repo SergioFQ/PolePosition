@@ -9,7 +9,8 @@ using UnityEngine;
 public class PolePositionManager : NetworkBehaviour
 {
     #region Variables
-    //Zona SyncVars
+
+    // SyncVars
     [SyncVar(hook = nameof(numPlayersHook))] public int numPlayers;
     [SyncVar(hook = nameof(SetRaceOrder))] private string myRaceOrder = "";
     [SyncVar(hook = nameof(UpdateNamesRanking))] public string namesRanking = "";
@@ -18,7 +19,7 @@ public class PolePositionManager : NetworkBehaviour
     [SyncVar] public bool started = false;
     [SyncVar] public int numVueltas;
 
-    //Zona Public
+    // Public
     public NetworkManager networkManager;
     public Vector3[] posSphere;
     public readonly List<PlayerInfo> m_Players = new List<PlayerInfo>(4);
@@ -30,22 +31,22 @@ public class PolePositionManager : NetworkBehaviour
     public Mutex inRankingPlayer = new Mutex();
     public Mutex mutexNamesRanking = new Mutex();
 
-    //Zona Private
+    // Private
     private List<PlayerInfo> ordenP = new List<PlayerInfo>(4);
     private CircuitController m_CircuitController;
     private GameObject[] m_DebuggingSpheres;
     private UIManager m_UIManager;
     private float[] arcLengths;
     private MyNetworkManager m_MyNetworkManager;
-    private MyChat m_chat;
+
     #endregion Variables
 
     #region Unity Callbacks
+
     private void Awake()
     {
         if (networkManager == null) networkManager = FindObjectOfType<NetworkManager>();
         if (m_CircuitController == null) m_CircuitController = FindObjectOfType<CircuitController>();
-        if (m_chat == null) m_chat = FindObjectOfType<MyChat>();
         posSphere = new Vector3[4];
         m_DebuggingSpheres = new GameObject[networkManager.maxConnections];
         for (int i = 0; i < networkManager.maxConnections; ++i)
@@ -74,6 +75,7 @@ public class PolePositionManager : NetworkBehaviour
         if (m_Players.Count == 0) { return; }
         UpdateRaceProgress();
     }
+
     #endregion Unity Callbacks
 
     #region Methods
@@ -196,7 +198,7 @@ public class PolePositionManager : NetworkBehaviour
         }
     }
 
-    public void startRace()
+    public void StartRace()
     {
         if (!started)
         {
@@ -233,7 +235,7 @@ public class PolePositionManager : NetworkBehaviour
             m_Players[i].ID--;
         }
         m_Players.RemoveAt(id);
-        takenPositions(id);
+        TakenPositions(id);
         if (m_Players.Count > 0)
         {
             RpcDeletePlayer(id);
@@ -252,7 +254,7 @@ public class PolePositionManager : NetworkBehaviour
 
     }
 
-    public void takenPositions(int id)
+    public void TakenPositions(int id)
     {
         for (int i = 0; i < 4; i++)
         {
@@ -264,11 +266,12 @@ public class PolePositionManager : NetworkBehaviour
         m_MyNetworkManager.positionsIDs[id] = -1;
     }
 
+    // Compute the projection of the car position to the closest circuit 
+    // path segment and accumulate the arc-length along of the car along
+    // the circuit.
     void ComputeCarArcLength(int ID)
     {
-        // Compute the projection of the car position to the closest circuit 
-        // path segment and accumulate the arc-length along of the car along
-        // the circuit.
+        
         Vector3 carPos = this.m_Players[ID].transform.position;
         int segIdx;
         float carDist;
@@ -323,8 +326,6 @@ public class PolePositionManager : NetworkBehaviour
         }
     }
 
-
-
     public void SetNumLaps(int laps)
     {
         laps += 3;
@@ -339,9 +340,11 @@ public class PolePositionManager : NetworkBehaviour
             RpcSetNumLaps(laps);
         }
     }
+
     #endregion Methods
 
     #region ClientRPCs
+
     [ClientRpc]
     private void RpcVictoryByAbandonment()
     {
@@ -373,6 +376,7 @@ public class PolePositionManager : NetworkBehaviour
         numVueltas = laps;
         m_UIManager.textLaps.text = "Lap 0/" + laps;
     }
+
     #endregion ClientRPCs
 
     #region Hooks
@@ -412,6 +416,7 @@ public class PolePositionManager : NetworkBehaviour
     {
         m_SetUpPlayer.m_PlayerController.posRanking = posRanking[old].transform.position;
     }
+
     #endregion Hooks
 
 }

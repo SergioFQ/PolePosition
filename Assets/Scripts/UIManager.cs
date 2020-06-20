@@ -137,7 +137,7 @@ public class UIManager : MonoBehaviour
     {
         buttonReady.GetComponent<Image>().color = Color.green;
         buttonReady.onClick.RemoveAllListeners();
-        m_polePositionManager.startRace();
+        m_polePositionManager.StartRace();
     }
 
     public void UpdateSpeed(int speed)

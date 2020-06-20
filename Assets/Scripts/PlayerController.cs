@@ -23,25 +23,25 @@ public class PlayerController : NetworkBehaviour
     public float downForce = 100f;
     public float slipLimit = 0.2f; //coeficiente de rozamiento
 
-    //Control vehiculo
+    // Control vehiculo
     private float CurrentRotation { get; set; }
     private float InputAcceleration { get; set; }
     private float InputSteering { get; set; }
     private float InputBrake { get; set; }
 
-    //SyncVar
+    // SyncVar
     [SyncVar(hook = nameof(SetLap))] public int m_CurrentLap;
     [SyncVar(hook = nameof(FinalTotalTimeToString))] public string finalTotalTime = "";
     [SyncVar(hook = nameof(FinalBestLapTimeToString))] public string bestLapTime = "";
 
-    //Public
+    // Public
     public UIManager m_UIManager;
     public bool isReady = false;
     public Vector3 posRanking;
     public int numVueltas;
     public Mutex mutexTimes = new Mutex();
 
-    //Private
+    // Private
     private PlayerInfo m_PlayerInfo;
     private WheelFrictionCurve frictionCurve;
     private Rigidbody m_Rigidbody;
@@ -99,6 +99,41 @@ public class PlayerController : NetworkBehaviour
         if (Input.GetKeyUp(KeyCode.F) && isReady)
         {
             debugUpsideDown = true;
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+
+        if (collision.transform.tag == "OutRace")
+        {
+            CrashSpawn();
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.transform.tag == "Checkpoint")
+        {
+            int id = other.GetComponent<CheckpointsBehaviour>().ID;
+            if ((id == m_PlayerInfo.LastPoint + 1) || (id == 0 && m_PlayerInfo.LastPoint == 12))
+            {
+                m_PlayerInfo.LastPoint = id;
+            }
+            if (id <= m_PlayerInfo.LastPoint - 1)
+            {
+                if (isLocalPlayer)
+                    m_UIManager.SetWrongWay(true);
+            }
+            else
+            {
+                if (isLocalPlayer)
+                    m_UIManager.SetWrongWay(false);
+            }
+            if (id <= m_PlayerInfo.LastPoint - 3 || (m_PlayerInfo.LastPoint <= 3 && id >= 8)) //mal recorrido
+            {
+                CrashSpawn();
+            }
         }
     }
 
@@ -183,7 +218,6 @@ public class PlayerController : NetworkBehaviour
 
     #region Methods
 
-
     private void SavingPosition()
     {
         if (debugUpsideDown && isReady)
@@ -214,42 +248,6 @@ public class PlayerController : NetworkBehaviour
         transform.position = new Vector3(posAux.x, posAux.y + 3, posAux.z);
         transform.LookAt(m_PolePositionManager.checkpoints[(m_PlayerInfo.LastPoint + 1) % m_PolePositionManager.checkpoints.Length].transform.position);
     }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-
-        if (collision.transform.tag == "OutRace")
-        {
-            CrashSpawn();
-        }
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.transform.tag == "Checkpoint")
-        {
-            int id = other.GetComponent<CheckpointsBehaviour>().ID;
-            if ((id == m_PlayerInfo.LastPoint + 1) || (id == 0 && m_PlayerInfo.LastPoint == 12))
-            {
-                m_PlayerInfo.LastPoint = id;
-            }
-            if (id <= m_PlayerInfo.LastPoint - 1)
-            {
-                if (isLocalPlayer)
-                    m_UIManager.SetWrongWay(true);
-            }
-            else
-            {
-                if (isLocalPlayer)
-                    m_UIManager.SetWrongWay(false);
-            }
-            if (id <= m_PlayerInfo.LastPoint - 3 || (m_PlayerInfo.LastPoint <= 3 && id >= 8)) //mal recorrido
-            {
-                CrashSpawn();
-            }
-        }
-    }
-
 
     // crude traction control that reduces the power to wheel if the car is wheel spinning too much
     private void TractionControl()
@@ -293,8 +291,8 @@ public class PlayerController : NetworkBehaviour
             m_Rigidbody.velocity = topSpeed * m_Rigidbody.velocity.normalized;
     }
 
-    // finds the corresponding visual wheel
-    // correctly applies the transform
+    // Finds the corresponding visual wheel
+    // Correctly applies the transform
     public void ApplyLocalPositionToVisuals(WheelCollider col)
     {
         if (col.transform.childCount == 0)
@@ -405,8 +403,6 @@ public class PlayerController : NetworkBehaviour
         LapTime[0].Start();
     }
 
-
-
     public string TimeToString(Stopwatch s)
     {
         timeSpan = s.Elapsed;
@@ -417,8 +413,6 @@ public class PlayerController : NetworkBehaviour
 
     }
 
-
-
     public void IncreaseLap(int id)
     {
         if (isLocalPlayer)
@@ -426,8 +420,6 @@ public class PlayerController : NetworkBehaviour
             CmdIncreaseLap(id);
         }
     }
-
-
 
     #endregion
 
