@@ -23,84 +23,38 @@ public class PlayerController : NetworkBehaviour
     public float downForce = 100f;
     public float slipLimit = 0.2f; //coeficiente de rozamiento
 
+    //Control vehiculo
     private float CurrentRotation { get; set; }
     private float InputAcceleration { get; set; }
     private float InputSteering { get; set; }
     private float InputBrake { get; set; }
 
-    private PlayerInfo m_PlayerInfo;
+    //SyncVar
+    [SyncVar(hook = nameof(SetLap))] public int m_CurrentLap;
+    [SyncVar(hook = nameof(FinalTotalTimeToString))] public string finalTotalTime = "";
+    [SyncVar(hook = nameof(FinalBestLapTimeToString))] public string bestLapTime = "";
+
+    //Public
     public UIManager m_UIManager;
-    private WheelFrictionCurve frictionCurve;//creamos la curva de fricción para eliminar la deriva
+    public bool isReady = false;
+    public Vector3 posRanking;
+    public int numVueltas;
+    public Mutex mutexTimes = new Mutex();
+
+    //Private
+    private PlayerInfo m_PlayerInfo;
+    private WheelFrictionCurve frictionCurve;
     private Rigidbody m_Rigidbody;
     private float m_SteerHelper = 0.8f;
     private float m_CurrentSpeed = 0;
-    [SyncVar(hook = nameof(SetLap))] public int m_CurrentLap;
-    private PolePositionManager m_PolePositionManager;//usado para controlar cuando el jugador vuelca
-    private CameraController m_cameraController;//usado para controlar cuando el jugador vuelca
+    private PolePositionManager m_PolePositionManager;
+    private CameraController m_cameraController;
     private bool debugUpsideDown = false;
-    public bool isReady = false;//variable que se usará para activar todos los coches a la vez
-    public Vector3 posRanking;
-    //private Stopwatch[] LapTime = new Stopwatch[2];
     private Stopwatch[] LapTime;
     private Stopwatch totalTime = new Stopwatch();
     private TimeSpan timeSpan = new TimeSpan();
-    [SyncVar(hook = nameof(FinalTotalTimeToString))] public string finalTotalTime = "";
-    [SyncVar(hook = nameof(FinalBestLapTimeToString))] public string bestLapTime = "";
-    Mutex mutexTimes = new Mutex();
-    public int numVueltas;
 
-    private float Speed
-    {
-        get { return m_CurrentSpeed; }
-        set
-        {
-            if (Math.Abs(m_CurrentSpeed - value) < float.Epsilon) return;
-            m_CurrentSpeed = value;
-            if (OnSpeedChangeEvent != null)
-                OnSpeedChangeEvent(m_CurrentSpeed);
-        }
-    }
-
-    public delegate void OnSpeedChangeDelegate(float newVal);
-
-    public event OnSpeedChangeDelegate OnSpeedChangeEvent;
-
-    private Stopwatch TotalTimeDel
-    {
-        get { return totalTime; }
-        set
-        {
-            if (Math.Abs(totalTime.Elapsed.TotalMilliseconds - value.Elapsed.TotalMilliseconds) < 0.0001f) return;
-            totalTime = value;
-            if (OnTotalTimeChangeEvent != null)
-                OnTotalTimeChangeEvent(totalTime);
-        }
-    }
-
-    public delegate void OnTotalTimeChangeDelegate(Stopwatch newVal);
-
-    public event OnTotalTimeChangeDelegate OnTotalTimeChangeEvent;
-
-    private Stopwatch LapTimeDel
-    {
-        get { return LapTime[m_CurrentLap]; }
-        set
-        {
-            if (Math.Abs(totalTime.Elapsed.TotalMilliseconds - value.Elapsed.TotalMilliseconds) < 0.0001f) return;
-            if(m_CurrentLap == -1) LapTime[0] = value;
-            else { LapTime[m_CurrentLap] = value; }
-            if (OnLapTimeChangeEvent != null)
-            {
-                if (m_CurrentLap == -1)
-                    OnLapTimeChangeEvent(LapTime[0]);
-                else { OnLapTimeChangeEvent(LapTime[m_CurrentLap]); }
-            }
-        }
-    }
-
-    public delegate void OnLapTimeChangeDelegate(Stopwatch newVal);
-
-    public event OnLapTimeChangeDelegate OnLapTimeChangeEvent;
+    
 
 
     #endregion Variables
@@ -120,7 +74,6 @@ public class PlayerController : NetworkBehaviour
         LapTime = new Stopwatch[5];
         for (int i = 0; i < 5; i++)
             LapTime[i] = new Stopwatch();
-        //pos = transform.position;
         numVueltas = m_PolePositionManager.numVueltas;
     }
 
@@ -133,7 +86,7 @@ public class PlayerController : NetworkBehaviour
         InputBrake = Input.GetAxis("Jump");
         Speed = m_Rigidbody.velocity.magnitude;
         TotalTimeDel = totalTime;
-        if (m_CurrentLap < numVueltas/*LapTime.Length*/ && m_CurrentLap!=-1)
+        if (m_CurrentLap < numVueltas && m_CurrentLap!=-1)
         {
             LapTimeDel = LapTime[m_CurrentLap];
         }
@@ -142,7 +95,7 @@ public class PlayerController : NetworkBehaviour
             LapTimeDel = LapTime[0];
         }
 
-        //Debug volcar y spawnear cuando salimos de la pista
+        //Tecla respawn voluntaria
         if (Input.GetKeyUp(KeyCode.F) && isReady)
         {
             debugUpsideDown = true;
@@ -199,7 +152,7 @@ public class PlayerController : NetworkBehaviour
                 //si la velocidad es demasiado baja (estamos parados), subimos el rozamiento lateral para impedir la deriva del jugador. Una vez en moviemiento volverá a su valor inicial que es 0.2
                 if (Math.Abs(axleInfo.leftWheel.attachedRigidbody.velocity.magnitude) < 0.25f)
                 {
-                    frictionCurve.extremumSlip = 0.3f;//nuevo valor rozamiento
+                    frictionCurve.extremumSlip = 0.3f;
                 }
                 else
                 {
@@ -215,12 +168,9 @@ public class PlayerController : NetworkBehaviour
             axleInfo.leftWheel.sidewaysFriction = frictionCurve;
             axleInfo.rightWheel.sidewaysFriction = frictionCurve;
 
-            ApplyLocalPositionToVisuals(axleInfo.leftWheel);//las ruedas estan al reves nombradas (es como si se viesen de frente y no de espaldas)
+            ApplyLocalPositionToVisuals(axleInfo.leftWheel);
             ApplyLocalPositionToVisuals(axleInfo.rightWheel);
         }
-        //Transform pos = m_Rigidbody.transform;
-        //transform.position = pos.position;
-        //CmdUpdatePos(m_PlayerInfo.ID, frictionCurve.extremumSlip);
 
         SavingPosition();
         SteerHelper();
@@ -241,8 +191,7 @@ public class PlayerController : NetworkBehaviour
             transform.Rotate(0, 0, 90);
             debugUpsideDown = false;
         }
-
-        //si esta volcado
+        
         if (Vector3.Dot(transform.up, Vector3.down) > 0 && isReady)
         {
             CrashSpawn();
@@ -283,7 +232,6 @@ public class PlayerController : NetworkBehaviour
             if ((id == m_PlayerInfo.LastPoint + 1) || (id == 0 && m_PlayerInfo.LastPoint == 12))
             {
                 m_PlayerInfo.LastPoint = id;
-                //pos = other.transform.position;
             }
             if (id <= m_PlayerInfo.LastPoint - 1)
             {
@@ -295,7 +243,7 @@ public class PlayerController : NetworkBehaviour
                 if (isLocalPlayer)
                     m_UIManager.SetWrongWay(false);
             }
-            if (id <= m_PlayerInfo.LastPoint - 3 || (m_PlayerInfo.LastPoint <= 3 && id >= 8)) //comprobamos el hacer mal el recorrido
+            if (id <= m_PlayerInfo.LastPoint - 3 || (m_PlayerInfo.LastPoint <= 3 && id >= 8)) //mal recorrido
             {
                 CrashSpawn();
             }
@@ -388,30 +336,11 @@ public class PlayerController : NetworkBehaviour
         CurrentRotation = transform.eulerAngles.y;
     }
 
-    private void SetLap(int old, int newLap)
-    {
-        //if (newLap == 0) { return; }
-        if (newLap > 0)
-        {
-            LapTime[newLap - 1].Stop();
-            if (!(newLap >= numVueltas/*LapTime.Length*/))
-            {
-                LapTime[newLap] = new Stopwatch();
-                LapTime[newLap].Start();
-            }
-        }       
-
-        if (isLocalPlayer)
-        {
-            m_PlayerInfo.CurrentLap = newLap;
-            m_UIManager.UpdateLap(m_PlayerInfo.CurrentLap);
-        }
-    }
 
     public void setInactiveByAbandonmet()
     {
         totalTime.Stop();
-        if(m_CurrentLap != -1 && m_CurrentLap < numVueltas /*2*/)
+        if(m_CurrentLap != -1 && m_CurrentLap < numVueltas)
         {
             LapTime[m_CurrentLap].Stop();
         }
@@ -444,7 +373,7 @@ public class PlayerController : NetworkBehaviour
             CmdUpdateTime(m_PlayerInfo.FinalTime, m_PlayerInfo.BestLapTime);
             mutexTimes.ReleaseMutex();
         }
-        //print(finalTotalTime);
+
         WheelFrictionCurve friction = axleInfos[0].leftWheel.forwardFriction;
         m_Rigidbody.velocity = Vector3.zero;
         m_Rigidbody.angularVelocity = Vector3.zero;
@@ -467,63 +396,6 @@ public class PlayerController : NetworkBehaviour
         isReady = false;
     }
 
-    [Command]
-    private void CmdUpdateTime(string time, string bestlapTime)
-    {
-
-        finalTotalTime = time;
-        bestLapTime = bestlapTime;
-    }
-
-    [Command]
-    private void CmdIncreaseLap(int id)
-    {
-        m_CurrentLap++;
-        m_PolePositionManager.m_Players[id].CurrentLap = m_CurrentLap;
-    }
-
-    [ClientRpc]
-    private void RpcUpdatePos (int id, float frictionCurve)
-    {
-        WheelFrictionCurve aux = m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[0].leftWheel.sidewaysFriction;
-        aux.extremumSlip = frictionCurve;
-        m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[0].leftWheel.sidewaysFriction = aux;
-        m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[0].rightWheel.sidewaysFriction = aux;
-        m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[1].leftWheel.sidewaysFriction = aux;
-        m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[1].rightWheel.sidewaysFriction = aux;
-        //if (m_PlayerInfo.ID != id){}
-    }
-
-    [Command]
-    private void CmdUpdatePos (int id, float frictionCurve)
-    {
-        if(m_PolePositionManager.m_Players[id] != null)
-        {
-            WheelFrictionCurve aux = m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[0].leftWheel.sidewaysFriction;
-            aux.extremumSlip = frictionCurve;
-            m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[0].leftWheel.sidewaysFriction = aux;
-            m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[0].rightWheel.sidewaysFriction = aux;
-            m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[1].leftWheel.sidewaysFriction = aux;
-            m_PolePositionManager.m_Players[id].GetComponent<PlayerController>().axleInfos[1].rightWheel.sidewaysFriction = aux;
-
-            RpcUpdatePos(id, frictionCurve);
-        }
-        
-    }
-
-    [Command]
-    public void CmdSetNumLaps()
-    {
-        RpcSetNumLaps(numVueltas);
-        print(" NumVueltas en el command " + numVueltas);
-    }
-
-    [ClientRpc]
-    private void RpcSetNumLaps(int laps)
-    {
-        numVueltas = laps;
-        m_UIManager.textLaps.text = "0/" + laps;
-    }
 
     public void StartTime()
     {
@@ -545,16 +417,7 @@ public class PlayerController : NetworkBehaviour
 
     }
 
-    private void FinalBestLapTimeToString(string old, string newTime)
-    {
-        m_PlayerInfo.BestLapTime = newTime;
-        m_UIManager.UpdateLapTimeRanking(m_PlayerInfo.BestLapTime);
-    }
 
-    private void FinalTotalTimeToString(string old, string newTime)
-    {
-        m_UIManager.UpdateTotalTimeRanking(newTime);
-    }
 
     public void IncreaseLap(int id)
     {
@@ -564,7 +427,131 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    
+
 
     #endregion
+
+    #region Delegates
+
+    private float Speed
+    {
+        get { return m_CurrentSpeed; }
+        set
+        {
+            if (Math.Abs(m_CurrentSpeed - value) < float.Epsilon) return;
+            m_CurrentSpeed = value;
+            if (OnSpeedChangeEvent != null)
+                OnSpeedChangeEvent(m_CurrentSpeed);
+        }
+    }
+
+    public delegate void OnSpeedChangeDelegate(float newVal);
+
+    public event OnSpeedChangeDelegate OnSpeedChangeEvent;
+
+    private Stopwatch TotalTimeDel
+    {
+        get { return totalTime; }
+        set
+        {
+            if (Math.Abs(totalTime.Elapsed.TotalMilliseconds - value.Elapsed.TotalMilliseconds) < 0.0001f) return;
+            totalTime = value;
+            if (OnTotalTimeChangeEvent != null)
+                OnTotalTimeChangeEvent(totalTime);
+        }
+    }
+
+    public delegate void OnTotalTimeChangeDelegate(Stopwatch newVal);
+
+    public event OnTotalTimeChangeDelegate OnTotalTimeChangeEvent;
+
+    private Stopwatch LapTimeDel
+    {
+        get { return LapTime[m_CurrentLap]; }
+        set
+        {
+            if (Math.Abs(totalTime.Elapsed.TotalMilliseconds - value.Elapsed.TotalMilliseconds) < 0.0001f) return;
+            if (m_CurrentLap == -1) LapTime[0] = value;
+            else { LapTime[m_CurrentLap] = value; }
+            if (OnLapTimeChangeEvent != null)
+            {
+                if (m_CurrentLap == -1)
+                    OnLapTimeChangeEvent(LapTime[0]);
+                else { OnLapTimeChangeEvent(LapTime[m_CurrentLap]); }
+            }
+        }
+    }
+
+    public delegate void OnLapTimeChangeDelegate(Stopwatch newVal);
+
+    public event OnLapTimeChangeDelegate OnLapTimeChangeEvent;
+
+    #endregion Delegates
+
+    #region Commands & ClientRPCs
+
+    [Command]
+    private void CmdUpdateTime(string time, string bestlapTime)
+    {
+
+        finalTotalTime = time;
+        bestLapTime = bestlapTime;
+    }
+
+    [Command]
+    private void CmdIncreaseLap(int id)
+    {
+        m_CurrentLap++;
+        m_PolePositionManager.m_Players[id].CurrentLap = m_CurrentLap;
+    }
+
+
+    [Command]
+    public void CmdSetNumLaps()
+    {
+        RpcSetNumLaps(numVueltas);
+        print(" NumVueltas en el command " + numVueltas);
+    }
+
+    [ClientRpc]
+    private void RpcSetNumLaps(int laps)
+    {
+        numVueltas = laps;
+        m_UIManager.textLaps.text = "0/" + laps;
+    }
+
+    #endregion Commands & ClientRPCs
+
+    #region Hooks
+
+    private void SetLap(int old, int newLap)
+    {
+        if (newLap > 0)
+        {
+            LapTime[newLap - 1].Stop();
+            if (!(newLap >= numVueltas))
+            {
+                LapTime[newLap] = new Stopwatch();
+                LapTime[newLap].Start();
+            }
+        }
+
+        if (isLocalPlayer)
+        {
+            m_PlayerInfo.CurrentLap = newLap;
+            m_UIManager.UpdateLap(m_PlayerInfo.CurrentLap);
+        }
+    }
+
+    private void FinalTotalTimeToString(string old, string newTime)
+    {
+        m_UIManager.UpdateTotalTimeRanking(newTime);
+    }
+
+    private void FinalBestLapTimeToString(string old, string newTime)
+    {
+        m_PlayerInfo.BestLapTime = newTime;
+        m_UIManager.UpdateLapTimeRanking(m_PlayerInfo.BestLapTime);
+    }
+    #endregion Hooks
 }

@@ -8,33 +8,39 @@ using UnityEngine;
 
 public class PolePositionManager : NetworkBehaviour
 {
+    #region Variables
+    //Zona SyncVars
     [SyncVar(hook = nameof(numPlayersHook))] public int numPlayers;
-    public NetworkManager networkManager;
-    public Vector3[] posSphere; //vector publico que guardaría la posición de las esferas
-    public readonly List<PlayerInfo> m_Players = new List<PlayerInfo>(4);
-    private List<PlayerInfo> ordenP = new List<PlayerInfo>(4);
-    private CircuitController m_CircuitController;
-    private GameObject[] m_DebuggingSpheres;
     [SyncVar(hook = nameof(SetRaceOrder))] private string myRaceOrder = "";
-    private UIManager m_UIManager;
-    private float[] arcLengths;
+    [SyncVar(hook = nameof(UpdateNamesRanking))] public string namesRanking = "";
+    [SyncVar(hook = nameof(SetOrderRanking))] public int ordenRanking = 0;
+    [SyncVar] public bool full = false;
+    [SyncVar] public bool started = false;
+    [SyncVar] public int numVueltas;
+
+    //Zona Public
+    public NetworkManager networkManager;
+    public Vector3[] posSphere;
+    public readonly List<PlayerInfo> m_Players = new List<PlayerInfo>(4);
     public GameObject[] checkpoints;
     public GameObject[] posRanking;
     public GameObject target;
-    [SerializeField] private GameObject cameraRankingPos;
-    //private PlayerInfo m_PlayerInfo; 
     public SetupPlayer m_SetUpPlayer;
-    [SyncVar(hook = nameof(UpdateNamesRanking))] public string namesRanking = "";
-    [SyncVar(hook = nameof(SetOrderRanking))] public int ordenRanking = 0;
     public Mutex readyPlayer = new Mutex();
     public Mutex inRankingPlayer = new Mutex();
     public Mutex mutexNamesRanking = new Mutex();
-    [SyncVar] public bool started = false;
-    [SyncVar] public bool full = false;
+
+    //Zona Private
+    private List<PlayerInfo> ordenP = new List<PlayerInfo>(4);
+    private CircuitController m_CircuitController;
+    private GameObject[] m_DebuggingSpheres;
+    private UIManager m_UIManager;
+    private float[] arcLengths;
     private MyNetworkManager m_MyNetworkManager;
     private MyChat m_chat;
-    [SyncVar] public int numVueltas;
+    #endregion Variables
 
+    #region Unity Callbacks
     private void Awake()
     {
         if (networkManager == null) networkManager = FindObjectOfType<NetworkManager>();
@@ -56,16 +62,10 @@ public class PolePositionManager : NetworkBehaviour
             full = false;
         }
         m_MyNetworkManager = FindObjectOfType<MyNetworkManager>();
-        //if (isServer)
-        //{
+        
             numVueltas = 3;
             print(numVueltas + " en el servidor");
-            //RpcSetNumLaps(numVueltas);
             m_UIManager.InitLaps();
-        //}
-
-        //m_SetUpPlayer = FindObjectOfType<SetupPlayer>();
-        //m_PlayerInfo = GetComponent<PlayerInfo>();
     }
 
     private void Update()
@@ -74,7 +74,9 @@ public class PolePositionManager : NetworkBehaviour
         if (m_Players.Count == 0) { return; }
         UpdateRaceProgress();
     }
+    #endregion Unity Callbacks
 
+    #region Methods
     public void AddPlayer(PlayerInfo player)
     {
         m_Players.Add(player);
@@ -84,11 +86,7 @@ public class PolePositionManager : NetworkBehaviour
             full = true;
         }
     }
-    /*public void activateChat()
-    {
 
-        if (m_chat == null) m_chat = FindObjectOfType<MyChat>();
-    }*/
     private class PlayerInfoComparer : Comparer<PlayerInfo>
     {
         float[] m_ArcLengths;
@@ -124,27 +122,12 @@ public class PolePositionManager : NetworkBehaviour
         }
     }
 
-    [ClientRpc]
-    private void RpcVictoryByAbandonment()
-    {
-        m_Players[0].GetComponent<PlayerController>().m_UIManager.ActivateEndingByAbandonment();
-        m_Players[0].GetComponent<PlayerController>().setInactiveByAbandonmet();
-    }
-
-    [ClientRpc]
-    public void RpcStoppedServer()
-    {
-        m_UIManager.ActivateServerOutHUD();
-    }
-
     private void CheckEnoughPlayers()
     {
         if (m_Players.Count == 1 && started)
         {
             m_Players[0].GetComponent<PlayerController>().setInactiveByAbandonmet();
             RpcVictoryByAbandonment();
-            //started = false;
-            // m_Players[0].GetComponent<SetupPlayer>().CmdEndServerGame();
         }
     }
 
@@ -170,10 +153,6 @@ public class PolePositionManager : NetworkBehaviour
 
                         RemovePlayer(i);
                     }
-                    /*if (isServerOnly && (m_Players.Count>0))
-                    {
-                        RpcDeletePlayer(i);
-                    }*/
                     full = false;
                     CheckEnoughPlayers();
                 }
@@ -223,18 +202,10 @@ public class PolePositionManager : NetworkBehaviour
         {
             if (isServer)
             {
-                //Interlocked.Increment(ref numPlayers);
 
                 readyPlayer.WaitOne();
                 numPlayers += 1;
                 readyPlayer.ReleaseMutex();
-                if (isServerOnly && numPlayers >= m_Players.Count)
-                {
-                    //started = true;
-                    //readyPlayer.WaitOne();
-                    //numPlayers = 0;
-                    //readyPlayer.ReleaseMutex();
-                }
             }
             else
             {
@@ -245,7 +216,6 @@ public class PolePositionManager : NetworkBehaviour
 
     public void EndServer()
     {
-        //Debug.Log("DEBERIA ACTIVAR EL HUD DE FIN SERVER");
         m_UIManager.ActiveEndServer();
         networkManager.StopHost();
     }
@@ -254,25 +224,6 @@ public class PolePositionManager : NetworkBehaviour
     {
         return started;
     }
-
-    [ClientRpc]
-    private void RpcDeletePlayer(int id)
-    {
-        for (int i = id + 1; i < m_Players.Count; i++)
-        {
-            m_Players[i].ID--;
-        }
-        m_Players.RemoveAt(id);
-    }
-
-    [ClientRpc]
-    private void RpcSetNumLaps(int laps)
-    {
-        m_SetUpPlayer.m_PlayerController.numVueltas = laps;
-        numVueltas = laps;
-        m_UIManager.textLaps.text = "Lap 0/" + laps;
-    }
-
 
     public void RemovePlayer(int id)
     {
@@ -283,7 +234,7 @@ public class PolePositionManager : NetworkBehaviour
         }
         m_Players.RemoveAt(id);
         takenPositions(id);
-        if(m_Players.Count > 0)
+        if (m_Players.Count > 0)
         {
             RpcDeletePlayer(id);
         }
@@ -313,42 +264,6 @@ public class PolePositionManager : NetworkBehaviour
         m_MyNetworkManager.positionsIDs[id] = -1;
     }
 
-    private void numPlayersHook(int old, int newValue)
-    {
-        print(newValue + " " + m_Players.Count + " " + started);
-        if ((newValue >= m_Players.Count && m_Players.Count > 1) && !started)
-        {
-            //started = true;
-            if (m_SetUpPlayer != null)
-            {
-                m_SetUpPlayer.CmdStarted();
-            }
-            /*if (isServer)
-            {
-                started = true;
-            }*/
-            /*else
-            {
-                m_SetUpPlayer.CmdStarted();
-            }*/
-            //
-            //m_SetUpPlayer.CmdStarted();
-            //Debug.Log(m_Started + " " + started);
-            if (m_SetUpPlayer != null && m_SetUpPlayer.m_PlayerController != null)
-            {
-                m_SetUpPlayer.m_PlayerController.isReady = true;
-                m_SetUpPlayer.m_PlayerController.StartTime();
-            }
-
-            m_UIManager.deactivateReadyMenu();
-            readyPlayer.WaitOne();
-            //numPlayers = 0;
-            readyPlayer.ReleaseMutex();
-        }
-    }
-
-
-    //[ClientRpc]
     void ComputeCarArcLength(int ID)
     {
         // Compute the projection of the car position to the closest circuit 
@@ -375,11 +290,6 @@ public class PolePositionManager : NetworkBehaviour
         }
         arcLengths[ID] = minArcL;
     }
-    void SetRaceOrder(string old, string newOrder)
-    {
-
-        m_UIManager.UpdateNames(newOrder);
-    }
 
     public void SetNamesRanking()
     {
@@ -402,7 +312,6 @@ public class PolePositionManager : NetworkBehaviour
 
         if (isServer)
         {
-            //Interlocked.Increment(ref ordenRanking);
             inRankingPlayer.WaitOne();
             ordenRanking++;
             inRankingPlayer.ReleaseMutex();
@@ -414,19 +323,8 @@ public class PolePositionManager : NetworkBehaviour
         }
     }
 
-    private void SetOrderRanking(int old, int newOR)
-    {
-        m_SetUpPlayer.m_PlayerController.posRanking = posRanking[old].transform.position;
-    }
 
-    private void UpdateNamesRanking(string old, string newOR)
-    {
-        m_UIManager.UpdateRanking(newOR);
-    }
-    /*private void UpdateRaceStart( bool old, bool newStart)
-    {
-        m_Started = newStart;
-    }*/
+
     public void SetNumLaps(int laps)
     {
         laps += 3;
@@ -441,5 +339,79 @@ public class PolePositionManager : NetworkBehaviour
             RpcSetNumLaps(laps);
         }
     }
+    #endregion Methods
+
+    #region ClientRPCs
+    [ClientRpc]
+    private void RpcVictoryByAbandonment()
+    {
+        m_Players[0].GetComponent<PlayerController>().m_UIManager.ActivateEndingByAbandonment();
+        m_Players[0].GetComponent<PlayerController>().setInactiveByAbandonmet();
+    }
+
+    [ClientRpc]
+    public void RpcStoppedServer()
+    {
+        m_UIManager.ActivateServerOutHUD();
+    }
+
+
+    [ClientRpc]
+    private void RpcDeletePlayer(int id)
+    {
+        for (int i = id + 1; i < m_Players.Count; i++)
+        {
+            m_Players[i].ID--;
+        }
+        m_Players.RemoveAt(id);
+    }
+
+    [ClientRpc]
+    private void RpcSetNumLaps(int laps)
+    {
+        m_SetUpPlayer.m_PlayerController.numVueltas = laps;
+        numVueltas = laps;
+        m_UIManager.textLaps.text = "Lap 0/" + laps;
+    }
+    #endregion ClientRPCs
+
+    #region Hooks
+
+    private void numPlayersHook(int old, int newValue)
+    {
+        print(newValue + " " + m_Players.Count + " " + started);
+        if ((newValue >= m_Players.Count && m_Players.Count > 1) && !started)
+        {
+            if (m_SetUpPlayer != null)
+            {
+                m_SetUpPlayer.CmdStarted();
+            }
+
+            if (m_SetUpPlayer != null && m_SetUpPlayer.m_PlayerController != null)
+            {
+                m_SetUpPlayer.m_PlayerController.isReady = true;
+                m_SetUpPlayer.m_PlayerController.StartTime();
+            }
+
+            m_UIManager.deactivateReadyMenu();
+        }
+    }
+
+    private void SetRaceOrder(string old, string newOrder)
+    {
+
+        m_UIManager.UpdateNames(newOrder);
+    }
+
+    private void UpdateNamesRanking(string old, string newOR)
+    {
+        m_UIManager.UpdateRanking(newOR);
+    }
+
+    private void SetOrderRanking(int old, int newOR)
+    {
+        m_SetUpPlayer.m_PlayerController.posRanking = posRanking[old].transform.position;
+    }
+    #endregion Hooks
 
 }
